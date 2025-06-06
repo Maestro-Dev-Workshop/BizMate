@@ -1,4 +1,4 @@
-from db_utils import db, cursor
+from .db_utils import db, cursor
 from datetime import datetime
 
 def insert(
@@ -17,9 +17,10 @@ def insert(
     Returns:
         Whether the row insertion was successful
     """
-    query = f"""INSERT INTO {tblname} ({cols}) VALUES ({values_fmt})"""
+    query = f"""INSERT INTO {tblname} {cols} VALUES ({values_fmt})"""
     try:
         cursor.execute(query, values)
+        db.commit()
         return "Row inserted"
     except Exception as e:
         db.rollback()
@@ -68,9 +69,10 @@ def update_table(tbl_name : str,
     """
     filters = " AND ".join([f"{col} = %s" for col in col_names])
     targets = ", ".join([f"{col} = %s" for col in target_cols])
-    query = f"""UPDATE {tbl_name} SET """ + targets + "WHERE" + filters
+    query = f"""UPDATE {tbl_name} SET """ + targets + " WHERE " + filters
     try:
         cursor.execute(query, target_vals + col_vals)
+        db.commit()
         return "Updated"
     except Exception as e:
         db.rollback()

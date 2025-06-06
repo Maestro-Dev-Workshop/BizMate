@@ -1,6 +1,10 @@
-from db_utils import db, cursor
-from datetime import datetime
-from database_manager.tools import insert, get_single_value, update_table
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+
+# from database_manager.db_utils import db, cursor
+from database_manager.tools import *
+import datetime
 
 def add_business(
         name : str,
@@ -20,13 +24,13 @@ def add_business(
         dob(str): User's date of birth in (YYYY-MM-DD)
         password: User's password
     
-    Returns: A message stating whether the operation was successfull
+    Returns: A message stating whether the operation was successful
     """
-    dob = datetime.strptime(dob,"%Y-%m-%d").date()
+    dob = datetime.datetime.strptime(dob,"%Y-%m-%d").date()
     date_joined = datetime.date.today()
-    values = (name, business_name, brief_description, date_joined, contact_details,physical_address,dob,password,True)
-    fmt = "%s, %s, %s, %s, %s, %s, %s, %s"
-    columns = "(username, business_name, brief_description, date_joined, contact_details, physical_address, dob(str), password, active)"
+    values = (name, business_name, brief_description, date_joined, contact_details,physical_address,dob,password,True,True)
+    fmt = "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s"
+    columns = "(username, business_name, brief_description, date_joined, contact_details, physical_address, date_of_birth, password, active, basic_info)"
     return insert("business", columns, values, fmt)
 
 
@@ -59,7 +63,7 @@ def add_product(
     """
     business_id = get_single_value("business", "business_name", business_name, "id")
     cols = (manufacturers, quantities, sps, negotiate_percents, expiry_dates, metadata)
-    expiry_dates = [[datetime.strptime(exp, "%Y-%m-%d").date() for exp in sublist] for sublist in expiry_dates]
+    expiry_dates = [[datetime.datetime.strptime(exp, "%Y-%m-%d").date() for exp in sublist] for sublist in expiry_dates]
     columns = "(business_id, item_name, manufacturer, quantity_in_stock, selling_price, negotiate_percent, expiry_date, metadata)"
     fmt = fmt = "%s, %s, %s, %s, %s, %s, %s, %s"
     message = {}
@@ -95,11 +99,11 @@ def add_supplier(business_name:str,
     inv_cols = "(product_id,supplier_id,cost_price,available)"
     inv_fmt = "%s, %s, %s, %s"
     message = {}
+    supplier_vals = (business_id,name, contact_det)
+    message[f"supplier:{name}"] = insert("supplier", supplier_cols, supplier_vals, supp_fmt)
+    cursor.execute("""SELECT id from supplier WHERE business_id=%s AND contact_details=%s""",(business_id,contact_det))
+    supplier_id = cursor.fetchone()[0]
     for ind, product in enumerate(product_ids):
-        supplier_vals = (business_id,name, contact_det)
-        message[f"supplier:{name}"] = insert("supplier", supplier_cols, supplier_vals, supp_fmt)
-        cursor.execute("""SELECT id from supplier WHERE business_id=%s AND contact_details=%s""",(business_id,contact_det))
-        supplier_id = cursor.fetchone()[0]
         inv_vals = (product, supplier_id, cost_prices[ind], available[ind])
         message[f"product_id {product} from supplier {name}"] = insert("supplier_inventory",inv_cols,inv_vals,inv_fmt)
     return message
@@ -114,7 +118,7 @@ def delete_business(business_name : str) ->str:
     Returns
         whether the update operation was successful or not
     """
-    return update_table("business","business_name",business_name,"active",False)
+    return update_table("business",["business_name"],[business_name],["active"],[False])
 
 def verify_business(business_name: str) -> str:
     """Verifies if the business exist then it returns the id
@@ -127,7 +131,44 @@ def verify_business(business_name: str) -> str:
     """
     id = get_single_value("business", "business_name", business_name, "id"),
     active = get_single_value("business", "business_name", business_name, "active")
-    if isinstance(active,bool):
+    if isinstance(active,int):
         return id if active else "Does not Exist"
     else:
-        return id
+        return "Does Not Exist"
+
+
+# print(add_business(
+#     name="Quam",
+#     business_name="GS",
+#     brief_description="evoerv,se",
+#     contact_details="evorev",
+#     physical_address="evmepw,",
+#     dob="2005-04-01",
+#     password="everv"
+# ))
+
+# print(
+#     add_product(
+#         "GS",
+#         item_names=["Cement", "Vegetable Oil"],
+#         manufacturers=[["Dangote", "Lafarge"],["King", "Mamador"]],
+#         quantities=[[200,20],[10,5]],
+#         sps=[[11000,14000],[4000,2000]],
+#         negotiate_percents=[[0,0],[3,2]],
+#         expiry_dates=[["2030-03-04","2036-04-05"],["2026-03-30","2025-02-20"]],
+#         metadata=[["10kg","In half bags"], ["20kg","2kg"]]
+#     )
+# )
+
+# print(add_supplier(
+#         "GS",
+#         name="SG",
+#         contact_det="0402345453",
+#         product_ids=["1","2","3","4"],
+#         cost_prices=[10000,5000,2300,1000],
+#         available=[True,False,False,True]
+#     )
+# )
+
+# print(verify_business("GS"))
+# print(verify_business("rveim"))
