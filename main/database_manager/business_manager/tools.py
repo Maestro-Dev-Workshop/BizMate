@@ -6,38 +6,11 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 from database_manager.tools import *
 import datetime
 
-def add_business(
-        name : str,
-        business_name : str,
-        brief_description : str,
-        contact_details : str,
-        physical_address: str,
-        dob:str,
-        password:str) -> str:
-    """Adds a business basic information to the database
-    Args:
-        name(str): Name of the business owner
-        business_name(str): Name of the business
-        brief_description(str): Brief description about the database
-        contact_details(str): The contact details of the user either email or phone number
-        physical_address(str): The physical address of the store
-        dob(str): User's date of birth in (YYYY-MM-DD)
-        password: User's password
-    
-    Returns: A message stating whether the operation was successful
-    """
-    dob = datetime.datetime.strptime(dob,"%Y-%m-%d").date()
-    date_joined = datetime.date.today()
-    values = (name, business_name, brief_description, date_joined, contact_details,physical_address,dob,password,True,True)
-    fmt = "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s"
-    columns = "(username, business_name, brief_description, date_joined, contact_details, physical_address, date_of_birth, password, active, basic_info)"
-    return insert("business", columns, values, fmt)
-
-
 def add_product(
         business_name:str,
         item_names:list[str],
-        manufacturers:list[list[str]],
+        categories: list[str],
+        brands:list[list[str]],
         quantities: list[list[int]],
         sps: list[list[float]],
         negotiate_percents: list[list[float]],
@@ -50,6 +23,7 @@ def add_product(
     Args:
     business_name(str): name of the business that owns such item
     item_names(list[str]): list of items to add to the table
+    categories(list[str]) : contains the category for each item
     manufacturer(list[list[str]]): list of lists, in which for each list contains the available manufacturer for an item
     quantities(list[list[int]]): list of lists, in which for each list contains the quantity available for an item 
     selling_price(list[list[float]]) : list of lists, in which for each list contains the price available for an item 
@@ -62,15 +36,15 @@ def add_product(
     
     """
     business_id = get_single_value("business", "business_name", business_name, "id")
-    cols = (manufacturers, quantities, sps, negotiate_percents, expiry_dates, metadata)
+    cols = (brands, quantities, sps, negotiate_percents, expiry_dates, metadata)
     expiry_dates = [[datetime.datetime.strptime(exp, "%Y-%m-%d").date() for exp in sublist] for sublist in expiry_dates]
-    columns = "(business_id, item_name, manufacturer, quantity_in_stock, selling_price, negotiate_percent, expiry_date, metadata)"
-    fmt = fmt = "%s, %s, %s, %s, %s, %s, %s, %s"
+    columns = "(business_id, item_name, category, manufacturer, quantity_in_stock, selling_price, negotiate_percent, expiry_date, metadata)"
+    fmt = fmt = "%s, %s, %s, %s, %s, %s, %s, %s, %s"
     message = {}
     for ind in range(len(item_names)):
-        for sub_ind in range(len(manufacturers[ind])):
-            row = [business_id, item_names[ind]] + [col[ind][sub_ind] for col in cols]
-            message[f"{item_names[ind]}, Manufacturer: {manufacturers[ind][sub_ind]}"] = insert("product", columns, row, fmt)
+        for sub_ind in range(len(brands[ind])):
+            row = [business_id, item_names[ind], categories[ind]] + [col[ind][sub_ind] for col in cols]
+            message[f"{item_names[ind]}, Manufacturer: {brands[ind][sub_ind]}"] = insert("product", columns, row, fmt)
     return message
 
 
@@ -137,21 +111,12 @@ def verify_business(business_name: str) -> str:
         return "Does Not Exist"
 
 
-# print(add_business(
-#     name="Quam",
-#     business_name="GS",
-#     brief_description="evoerv,se",
-#     contact_details="evorev",
-#     physical_address="evmepw,",
-#     dob="2005-04-01",
-#     password="everv"
-# ))
 
 # print(
 #     add_product(
 #         "GS",
 #         item_names=["Cement", "Vegetable Oil"],
-#         manufacturers=[["Dangote", "Lafarge"],["King", "Mamador"]],
+#         brands=[["Dangote", "Lafarge"],["King", "Mamador"]],
 #         quantities=[[200,20],[10,5]],
 #         sps=[[11000,14000],[4000,2000]],
 #         negotiate_percents=[[0,0],[3,2]],
