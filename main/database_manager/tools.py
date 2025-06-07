@@ -114,7 +114,7 @@ def get_rows_with_exact_column_value(
     try:
         cursor.execute(query, (value,))
         result = cursor.fetchall()
-        return result[0] if result else None
+        return result if result else None
     except Exception as e:
         return f"Error: {e}"
 
