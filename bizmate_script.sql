@@ -25,9 +25,10 @@ CREATE TABLE product (
     item_name VARCHAR(255),
     category VARCHAR(255),
     brand VARCHAR(255),
+    minimum_threshold INTEGER,
     quantity_in_stock INTEGER,
     selling_price DECIMAL,
-    negotiate_percent DECIMAL,
+    minimum_selling_price DECIMAL,
     expiry_date VARCHAR(10),
     metadata TEXT,
     FOREIGN KEY (business_id) REFERENCES business(id)
@@ -40,7 +41,6 @@ CREATE TABLE customer (
     name VARCHAR(255),
     age INT,
     gender VARCHAR(1),
-    
     contact_details VARCHAR(255)
 );
 

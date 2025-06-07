@@ -1,6 +1,6 @@
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..','..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from database_manager.tools import *
 import datetime
 
@@ -31,13 +31,30 @@ def add_business(
     columns = "(username, business_name, brief_description, date_joined, contact_details, physical_address, date_of_birth, password, active, basic_info)"
     return insert("business", columns, values, fmt)
 
+def delete_business(business_name : str) ->str:
+    """Updates active column to false
+    
+    Args:
+        business_name(str): Name of the business
+    
+    Returns
+        whether the update operation was successful or not
+    """
+    return update_table("business",["business_name"],[business_name],["active"],[False])
 
-# print(add_business(
-#     name="Quam",
-#     business_name="GS",
-#     brief_description="evoerv,se",
-#     contact_details="evorev",
-#     physical_address="evmepw,",
-#     dob="2005-04-01",
-#     password="everv"
-# ))
+def verify_business(business_name: str) -> str:
+    """Verifies if the business exist then it returns the id
+    
+    Args:
+        business_name(str): name of the business
+    
+    Returns:
+        the id of the business if it exists
+    """
+    ids = get_rows_with_exact_column_value("business", "business_name", business_name, "id"),
+    actives = get_rows_with_exact_column_value("business", "business_name", business_name, "active")
+    for id, active in zip(ids,actives):
+        if isinstance(active,int):
+            if active:
+                return id
+    return "Does Not Exist"

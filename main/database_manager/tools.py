@@ -96,7 +96,8 @@ def get_single_value(
 def get_rows_with_exact_column_value(
     tbl_name: str,
     col_name: str,
-    value: str
+    value: str,
+    target_col: str
     ):
     """
     Filters records by rows whose values exactly match the provided value in the specified column 
@@ -105,16 +106,17 @@ def get_rows_with_exact_column_value(
         tbl_name: name of the table
         col_name: name of the column to filter from
         value: the value to filter by
+        target_col: name of column to show
     
     Returns:
         Rows that fulfill the stated condition
     """
 
-    query = f"SELECT * FROM {tbl_name} WHERE {col_name} = %s"
+    query = f"SELECT {target_col} FROM {tbl_name} WHERE {col_name} = %s"
     try:
         cursor.execute(query, (value,))
         result = cursor.fetchall()
-        return result if result else None
+        return result
     except Exception as e:
         return f"Error: {e}"
 
@@ -170,3 +172,4 @@ def update_table(tbl_name : str,
     except Exception as e:
         db.rollback()
         return f"Error updating {tbl_name}: {e}"
+
