@@ -43,16 +43,12 @@ def add_item(
             message[f"{item_names[ind]}, brand: {brands[ind][sub_ind]}"] = insert("product", columns, row, fmt)
     return message
 
-print(
-    # add_item(
-    #     "xl_and_co",
-    #     item_names=["Cement", "Vegetable Oil"],
-    #     brands=[["Dangote", "Lafarge"],["King", "Mamador"]],
-    #     quantities=[[200,20],[10,5]],
-    #     sps=[[11000,14000],[4000,2000]],
-    #     negotiate_percents=[[0,0],[3,2]],
-    #     expiry_dates=[["2030-03-04","2036-04-05"],["2026-03-30","2025-02-20"]],
-    #     metadata=[["10kg","In half bags"], ["20kg","2kg"]]
-    # )
-    delete_row("product",col_names=["item_name","brand"],col_vals=["Cement","Dangote"])
-)
+
+def get_expired_goods():
+    today = datetime.date.today()
+    query = "SELECT * FROM product WHERE expiry_date < %s"
+    cursor.execute(query,(today,))
+    return f"Expired Goods : {cursor.fetchall()}"
+
+
+# print(describe_table("product"))

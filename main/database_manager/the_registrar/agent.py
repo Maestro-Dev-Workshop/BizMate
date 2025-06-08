@@ -42,7 +42,7 @@ root_agent = Agent(
     ### Deleting a Business ###
         Ensure you have the name of the business, verify whether the business exist, then use the tool delete_business.
     """,
-    tools=[add_business, verify_business,delete_business],
+    tools=[add_business, verify_business,delete_business]
 )
 
 # verify_business("xl_and_co")

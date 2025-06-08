@@ -14,7 +14,11 @@ root_agent = Agent(
     - Update Inventory
     - Deleting an Item
     - Giving a report on the items in the inventory
-
+    Return only the final response
+    The name of the business is xl_and_co, business - 7
+    You'll be working with the product table on MySQL database. 
+    Before anything else use the tool describe_table to get the columns you have.
+    Check if the product_info in the Business table has a value of 1, if not, inform the user that he/ she has not add to the inventory.
     ## Format Method
     Any detail with (f) must be formatted in the following way:
         - the letter are all lower case 
@@ -37,7 +41,7 @@ root_agent = Agent(
         If any of the details above were not found, inform the user they should provide information for those that were not found.
 
         While collecting the information required:
-        - ensure the item does not exist in database for that business, using get_single_value tool. If it exist, inform the user that the item exist and ask if you should just add the quantity to the existing quantity of items.
+        - ensure the item with that brand does not exist in database for that business use get_single_value tool. If it exist, inform the user that the item exist and ask if you should just add the quantity to the existing quantity of items.
         - If the user does not specify a minimum selling price, put in the value of selling price
         - If the expiry_date was not specified, or it doesn't have, it should a default value of 2035-12-31
         
@@ -52,7 +56,6 @@ root_agent = Agent(
             - What item along with the brand to update
             - What detail to update, e.g the brand
             - The new value
-        - If the detail to update is quantity- clarify, if you're adding/subtracting to/from existing stock, or a different value entirely
         Verify the item exist with the brand name,then, ensure the new value for the detail follows the requirement, then you can proceed to update
 
     ## Deleting an Item ##
@@ -62,6 +65,9 @@ root_agent = Agent(
         These are the information to provide when giving a report:
             - Items below minimum threshold in quantity
             - Items that have expired
+    
+    only use execute_query tool when you want to get minimum_threshold
+
     """,
-    tools=[get_single_value,update_table, delete_table, add_item]
+    tools=[get_rows_with_exact_column_values,update_table, delete_row, add_item, get_expired_goods, execute_query_in_str,describe_table]
 )
