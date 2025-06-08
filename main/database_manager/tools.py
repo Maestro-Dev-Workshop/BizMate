@@ -173,3 +173,26 @@ def update_table(tbl_name : str,
         db.rollback()
         return f"Error updating {tbl_name}: {e}"
 
+
+def delete_row(tbl_name : str,
+                col_names : list[str],
+                col_vals : list[str]):
+    """
+    General function for deleting rows from table
+
+    Args:
+        tbl_name(str): Name of the table to update
+        col_names(list[str]): List of columns to be filtered
+        col_vals(list[str]): Contains values of the columns selected to be filtered
+    Returns:
+        whether the delete operation was successful
+    """
+    filters = " AND ".join([f"{col} = %s" for col in col_names])
+    query = f"""DELETE FROM {tbl_name} WHERE """ + filters
+    try:
+        cursor.execute(query, col_vals)
+        db.commit()
+        return "Deleted"
+    except Exception as e:
+        db.rollback()
+        return f"Error deleting from {tbl_name}: {e}"

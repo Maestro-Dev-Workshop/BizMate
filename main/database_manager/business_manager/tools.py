@@ -10,19 +10,6 @@ import datetime
 
 
 
-# print(
-#     add_product(
-#         "GS",
-#         item_names=["Cement", "Vegetable Oil"],
-#         brands=[["Dangote", "Lafarge"],["King", "Mamador"]],
-#         quantities=[[200,20],[10,5]],
-#         sps=[[11000,14000],[4000,2000]],
-#         negotiate_percents=[[0,0],[3,2]],
-#         expiry_dates=[["2030-03-04","2036-04-05"],["2026-03-30","2025-02-20"]],
-#         metadata=[["10kg","In half bags"], ["20kg","2kg"]]
-#     )
-# )
-
 # print(add_supplier(
 #         "GS",
 #         name="SG",
