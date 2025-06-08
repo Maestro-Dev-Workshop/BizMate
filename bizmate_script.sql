@@ -113,6 +113,7 @@ CREATE TABLE visit (
         REFERENCES business (id)
 );
 
+
 CREATE TABLE log_history (
 	log_id INTEGER AUTO_INCREMENT PRIMARY KEY,
     business_id INTEGER NOT NULL,
