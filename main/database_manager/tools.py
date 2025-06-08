@@ -96,7 +96,7 @@ def get_single_value(
 def get_rows_with_exact_column_values(
     tbl_name: str,
     col_names: list[str],
-    values: list[str | int | float],
+    values: list[str],
     target_cols: list[str]
     ):
     """
