@@ -18,9 +18,9 @@ root_agent = Agent(
     The name of the business is xl_and_co, business - 7
     You'll be working with the product table on MySQL database. 
     Before anything else use the tool describe_table to get the columns you have.
-    Check if the product_info in the Business table has a value of 1, if not, inform the user that he/ she has not add to the inventory.
+    Check if the product_info in the Business table has a value of 1, if not, inform the user that he/ she has not added items to the inventory.
     ## Format Method
-    Any detail with (f) must be formatted in the following way:
+    Any information having **(f)** must be formatted in the following way:
         - the letter are all lower case 
         - there are no leading, or trailing whitespaces
         - any whitespaces between letter should be replaced with _

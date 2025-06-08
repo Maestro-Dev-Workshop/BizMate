@@ -8,9 +8,10 @@ def add_item(
         business_name:str,
         item_names:list[str],
         brands:list[list[str]],
+        min_thresholds:list[list[str]],
         quantities: list[list[int]],
         sps: list[list[float]],
-        negotiate_percents: list[list[float]],
+        min_selling_prices: list[list[float]],
         expiry_dates: list[list[str]],
         metadata : list[list[str]]
 ) -> dict:
@@ -20,10 +21,11 @@ def add_item(
     Args:
     business_name(str): name of the business that owns such item
     item_names(list[str]): list of items to add to the table
-    brand(list[list[str]]): list of lists, in which for each list contains the available brand for an item
+    brands(list[list[str]]): list of lists, in which for each list contains the available brand for an item
+    min_thresholds(list[list[str]]): list of lists, in which for each list contains the minimum threshold for an item
     quantities(list[list[int]]): list of lists, in which for each list contains the quantity available for an item
     selling_price(list[list[float]]) : list of lists, in which for each list contains the price available for an item
-    negotiate_percent(list[list[float]]) : list of lists, in which for each list contains the percentage of negotiation available for an item
+    min_selling_price(list[list[float]]) : list of lists, in which for each list contains the percentage of negotiation available for an item
     expiry_date(list[list[str]]) : list of lists, in which for each list contains the expiry date for an item
     metadata(list[list[str]]) : list of lists, in which for each list contains other information about an item.
 
@@ -32,10 +34,10 @@ def add_item(
     
     """
     business_id = get_single_value("business", "business_name", business_name, "id")
-    cols = (brands, quantities, sps, negotiate_percents, expiry_dates, metadata)
+    cols = (brands, quantities, min_thresholds, sps, min_selling_prices, expiry_dates, metadata)
     expiry_dates = [[datetime.datetime.strptime(exp, "%Y-%m-%d").date() for exp in sublist] for sublist in expiry_dates]
-    columns = "(business_id, item_name, brand, quantity_in_stock, selling_price, negotiate_percent, expiry_date, metadata)"
-    fmt = fmt = "%s, %s, %s, %s, %s, %s, %s, %s"
+    columns = "(business_id, item_name, brand, quantity_in_stock, minimum_threshold, selling_price, minimum_selling_price, expiry_date, metadata)"
+    fmt = fmt = "%s, %s, %s, %s, %s, %s, %s, %s, %s"
     message = {}
     for ind in range(len(item_names)):
         for sub_ind in range(len(brands[ind])):

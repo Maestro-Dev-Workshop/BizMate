@@ -104,13 +104,15 @@ CREATE TABLE visit (
     customer_id INTEGER NOT NULL,
     business_id INTEGER NOT NULL,
     date_of_visit TIMESTAMP,
-    purchase_made BOOLEAN,
+    visit_summary TEXT,
+    orders_made INT,
     PRIMARY KEY (customer_id , business_id , date_of_visit),
     FOREIGN KEY (customer_id)
         REFERENCES customer (id),
     FOREIGN KEY (business_id)
         REFERENCES business (id)
 );
+
 
 CREATE TABLE log_history (
 	log_id INTEGER AUTO_INCREMENT PRIMARY KEY,
