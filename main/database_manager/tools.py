@@ -93,55 +93,68 @@ def get_single_value(
     except Exception as e:
         return f"Error: {e}"
 
-def get_rows_with_exact_column_value(
+def get_rows_with_exact_column_values(
     tbl_name: str,
-    col_name: str,
-    value: str,
-    target_col: str
+    col_names: list[str],
+    values: list[str | int | float],
+    target_cols: list[str]
     ):
     """
     Filters records by rows whose values exactly match the provided value in the specified column 
     
     Args:
         tbl_name: name of the table
-        col_name: name of the column to filter from
-        value: the value to filter by
-        target_col: name of column to show
+        col_names: names of the columns to filter from
+        value: the values to filter by
+        target_cols: list of columns to show
+        Note: The number of elements in col_names must match that of values
     
     Returns:
         Rows that fulfill the stated condition
     """
 
-    query = f"SELECT {target_col} FROM {tbl_name} WHERE {col_name} = %s"
+    filters = []
+    for i in range(len(col_names)):
+        filters.append(f"{col_names[i]} = %s")
+    query = f"SELECT {', '.join(target_cols)} FROM {tbl_name} WHERE {' AND '.join(filters)}"
+    
     try:
-        cursor.execute(query, (value,))
+        cursor.execute(query, values)
         result = cursor.fetchall()
         return result
     except Exception as e:
         return f"Error: {e}"
 
-def get_rows_with_matching_column_value(
+def get_rows_with_matching_column_values(
     tbl_name: str,
-    col_name: str,
-    value: str
+    col_names: list[str],
+    values: list[str],
+    target_cols: list[str]
     ):
     """
-    Filters records by rows whose values having matching pattern to the provided value in the specified column. Can be used as a searching function
+    Filters records by rows whose values having matching pattern to the provided values in the specified columns. Can be used as a searching function
     
     Args:
         tbl_name: name of the table
-        col_name: name of the column to filter from
-        value: the value to filter by
+        col_names: names of the columns to filter from
+        value: the values to filter by
+        target_cols: list of columns to show
+        Note: The number of elements in col_names must match that of values
     
     Returns:
         Rows that fulfill the stated condition
     """
 
-    query = f"SELECT * FROM {tbl_name} WHERE {col_name} = %%s%"
+    filters = []
+    for i in range(len(col_names)):
+        filters.append(f"{col_names[i]} LIKE %s")
+    query = f"SELECT {', '.join(target_cols)} FROM {tbl_name} WHERE {' AND '.join(filters)}"
+    values = [f"%{value}%" for value in values]
+
     try:
-        cursor.execute(query, (value,))
+        cursor.execute(query, values)
         result = cursor.fetchall()
-        return result[0] if result else None
+        return result
     except Exception as e:
         return f"Error: {e}"
 
