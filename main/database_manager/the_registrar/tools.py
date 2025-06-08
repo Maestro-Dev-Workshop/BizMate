@@ -4,6 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 from database_manager.tools import *
 import datetime
 
+
 def add_business(
         name : str,
         business_name : str,
@@ -54,7 +55,7 @@ def verify_business(business_name: str) -> str:
     ids = get_rows_with_exact_column_value("business", "business_name", business_name, "id"),
     actives = get_rows_with_exact_column_value("business", "business_name", business_name, "active")
     for id, active in zip(ids,actives):
-        if isinstance(active,int):
+        if isinstance(active[0],int):
             if active:
-                return id
+                return "Exists"
     return "Does Not Exist"

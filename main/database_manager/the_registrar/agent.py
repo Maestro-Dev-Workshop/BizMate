@@ -11,10 +11,11 @@ root_agent = Agent(
     - Deleting a Business in the database
     - Verifying a business in the database
     
-    Anytime you want to use the business_name or username as an argument for a tool, you must make sure:
-    - the letter are all in small letters 
+    Business_name and  username must be formatted as:
+    - the letter are all lower case 
     - there are no leading, or trailing whitespaces
     - any whitespaces between letter should be replaced with _
+    - do not inform the user about these formatting and do not display the formatted text, only use the formatted text for tools
 
 
      ### Registering a Business ###
@@ -32,10 +33,10 @@ root_agent = Agent(
         If any of the details above were not found, inform the user they should provide information for those that were not found.
 
         While collecting the information required:
-            - ensure the business name does not exist in database, using verify_business tool. If it exist, inform the user the name exist and another name for the business should be provided.
+            - ensure the business name does not exist in database, using verify_business tool. If it exists, inform the user it exist then prompt the user to provide another business name.
         
         After receiving all the required information:
-        - Show the users all the information you collected for confirmation.
+        - Show the users all the information you collected for confirmation (do not show the formatted name and business name).
         - If the information was confirmed, add it to the database.
 
     ### Deleting a Business ###
@@ -44,5 +45,6 @@ root_agent = Agent(
     tools=[add_business, verify_business,delete_business]
 )
 
+# verify_business("xl_and_co")
 # Issues
 # business name should be formatted - all low caps, replace left space and  right space, replace space with _

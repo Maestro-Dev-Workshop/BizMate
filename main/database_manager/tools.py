@@ -24,7 +24,7 @@ def describe_table(table_name: str) -> list[tuple[str, str]]:
     try:
         cursor.execute(f"DESCRIBE {table_name}")
         schema = cursor.fetchall()
-        return [(col[1], col[2]) for col in schema]
+        return schema
     except Exception as e:
         return f"Error: {e}"
 
@@ -40,9 +40,26 @@ def execute_query(sql: str) -> list[list[str]]:
 
     try:
         cursor.execute(sql)
-        return cursor.fetchall()
+        return f"""{cursor.fetchall()}"""
     except Exception as e:
         return f"Error: {e}"
+
+def execute_query_in_str(sql: str) -> list[list[str]]:
+    """
+    General function to execute an SQL statement, returning the results. Can be used to extract useful information.
+    
+    Args:
+        sql: the query to be executed
+    Returns:
+        The result of the query
+    """
+
+    try:
+        cursor.execute(sql)
+        return f"""{cursor.fetchall()}"""
+    except Exception as e:
+        return f"Error: {e}"
+
 
 def insert(
         tblname :str,
@@ -96,17 +113,17 @@ def get_single_value(
 def get_rows_with_exact_column_values(
     tbl_name: str,
     col_names: list[str],
-    values: list[str | int | float],
+    values: list[str],
     target_cols: list[str]
     ):
     """
     Filters records by rows whose values exactly match the provided value in the specified column 
     
     Args:
-        tbl_name: name of the table
-        col_names: names of the columns to filter from
-        value: the values to filter by
-        target_cols: list of columns to show
+        tbl_name (str): name of the table
+        col_names (list[str]): names of the columns to filter from
+        value (list[str| int |float]): the values to filter by
+        target_cols (list[str]): list of columns to show
         Note: The number of elements in col_names must match that of values
     
     Returns:
@@ -186,3 +203,26 @@ def update_table(tbl_name : str,
         db.rollback()
         return f"Error updating {tbl_name}: {e}"
 
+
+def delete_row(tbl_name : str,
+                col_names : list[str],
+                col_vals : list[str]):
+    """
+    General function for deleting rows from table
+
+    Args:
+        tbl_name(str): Name of the table to update
+        col_names(list[str]): List of columns to be filtered
+        col_vals(list[str]): Contains values of the columns selected to be filtered
+    Returns:
+        whether the delete operation was successful
+    """
+    filters = " AND ".join([f"{col} = %s" for col in col_names])
+    query = f"""DELETE FROM {tbl_name} WHERE """ + filters
+    try:
+        cursor.execute(query, col_vals)
+        db.commit()
+        return "Deleted"
+    except Exception as e:
+        db.rollback()
+        return f"Error deleting from {tbl_name}: {e}"
