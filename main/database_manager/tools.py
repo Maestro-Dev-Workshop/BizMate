@@ -1,5 +1,20 @@
 from .db_utils import db, cursor
-from datetime import datetime
+import datetime
+from decimal import Decimal
+
+def serialize_dict(obj):
+    if isinstance(obj, dict):
+        return {k: serialize_dict(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [serialize_dict(i) for i in obj]
+    elif isinstance(obj, tuple):
+        return [serialize_dict(i) for i in obj]
+    elif isinstance(obj, datetime.date):
+        return obj.isoformat()
+    elif isinstance(obj, Decimal):
+        return float(obj)
+    return obj
+
 
 def list_tables() -> list[str]:
     """Retrieve the names of all tables in the database."""
@@ -40,7 +55,7 @@ def execute_query(sql: str) -> list[list[str]]:
 
     try:
         cursor.execute(sql)
-        return f"""{cursor.fetchall()}"""
+        return serialize_dict(cursor.fetchall())
     except Exception as e:
         return f"Error: {e}"
 
@@ -60,7 +75,7 @@ def execute_query_in_str(sql: str) -> list[list[str]]:
     except Exception as e:
         return f"Error: {e}"
 
-
+# Quam oni werey
 def insert(
         tblname :str,
         cols : str,
@@ -138,7 +153,7 @@ def get_rows_with_exact_column_values(
     try:
         cursor.execute(query, values)
         result = cursor.fetchall()
-        return result
+        return serialize_dict(result)
     except Exception as e:
         return f"Error: {e}"
 
@@ -171,7 +186,7 @@ def get_rows_with_matching_column_values(
     try:
         cursor.execute(query, values)
         result = cursor.fetchall()
-        return result
+        return serialize_dict(result)
     except Exception as e:
         return f"Error: {e}"
 
