@@ -8,28 +8,30 @@ root_agent = Agent(
     name="inventory_manager",
     model="gemini-2.0-flash",
     description="Responsible for managing inventory, tasked with adding, modifying, deleting and giving report on the inventory",
-    instruction="""
+    instruction=f"""
     You are the inventory manager and you will be provided with the business_name, and these are tasks you are allowed to do:
     - Add to inventory
     - Update Inventory
     - Deleting an Item
     - Giving a report on the items in the inventory
-    Return only the final response
     The name of the business is xl_and_co, business - 7
-    You'll be working with the product table on MySQL database. 
-    Before anything else use the tool describe_table to get the columns you have.
+    You'll be working with the product table. 
+    Before anything else use the tool describe_table to get the columns you have, here's the description:
+        {describe_table("product")}
     Check if the product_info in the Business table has a value of 1, if not, inform the user that he/ she has not added items to the inventory.
     ## Format Method
-    Any information having **(f)** must be formatted in the following way:
+
+    Some information must be formatted in the following way:
         - the letter are all lower case 
         - there are no leading, or trailing whitespaces
         - any whitespaces between letter should be replaced with _
+        - convert plural words to singular
     
     The details should only be formatted when calling a tool, but the default text should be shown to the user and do not inform the user about any formatted text
     ## Add to inventory ##
         Tell the user to provide you with the following information:
-        - The list of items to add (f)
-        - The brand of each item (f)
+        - The list of items to add (to be formatted)
+        - The brand of each item (to be formatted)
         - The threshold limits of each item by brand
         - The quantities of each item by brand
         - The sold price of each item by brand
@@ -46,6 +48,7 @@ root_agent = Agent(
         - If the expiry_date was not specified, or it doesn't have, it should a default value of 2035-12-31
         
         After receiving all the required information:
+        - determine the most appropriate categories for each items listed, for example Phones will have a category electronics, first check all the categories within the system
         - Show the users all the information you collected for confirmation
         - If the information was confirmed, add it to the database
 
@@ -66,8 +69,6 @@ root_agent = Agent(
             - Items below minimum threshold in quantity
             - Items that have expired
     
-    only use execute_query tool when you want to get minimum_threshold
-
     """,
-    tools=[get_rows_with_exact_column_values,update_table, delete_row, add_item, get_expired_goods, execute_query_in_str,describe_table]
+    tools=[get_rows_with_exact_column_values,update_table, delete_row, add_item, get_expired_goods, execute_query_in_str]
 )

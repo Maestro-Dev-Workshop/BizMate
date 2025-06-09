@@ -52,8 +52,8 @@ def verify_business(business_name: str) -> str:
     Returns:
         the id of the business if it exists
     """
-    ids = get_rows_with_exact_column_value("business", "business_name", business_name, "id"),
-    actives = get_rows_with_exact_column_value("business", "business_name", business_name, "active")
+    ids = get_rows_with_exact_column_values("business", "business_name", business_name, "id"),
+    actives = get_rows_with_exact_column_values("business", "business_name", business_name, "active")
     for id, active in zip(ids,actives):
         if isinstance(active[0],int):
             if active:
