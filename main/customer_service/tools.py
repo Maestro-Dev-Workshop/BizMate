@@ -1,16 +1,16 @@
 import sys
 import os
-import datetime
-from collections.abc import Iterable
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from database_manager.tools import *
+import datetime
 
 
 def get_business_info(
         business_id: str
 ):
     """
+    Specialized Customer Service Agent Tool.
     Get some basic information about the business.
     
     Args:
@@ -24,27 +24,28 @@ def get_business_info(
         "business", 
         ["id"], 
         [business_id], 
-        cols)[0]
+        cols)
     
     if isinstance(result, str):
         return result
     else:
-        return {cols[i]: result[i] for i in range(len(cols))}
+        return {cols[i]: result[0][i] for i in range(len(cols))}
 
 
 def get_products_info(
         business_id: str
 ):
     """
+    Specialized Customer Service Agent Tool.
     Get the details of all the products a business offers.
     
     Args:
         business_id (str): the id of the business to search for (in string format).
     Returns:
-        A list of dictionaries, each representing a product, with keys: item_name, category, brand, quantity_in_stock, selling_price, and minimum_selling_price.
+        A list of dictionaries, each representing a product, with keys: id, item_name, category, brand, quantity_in_stock, selling_price, and minimum_selling_price.
     """
 
-    cols = ["item_name", "category", "brand", "quantity_in_stock", "selling_price", "minimum_selling_price"]
+    cols = ["id", "item_name", "category", "brand", "quantity_in_stock", "selling_price", "minimum_selling_price"]
     result = get_rows_with_exact_column_values(
         "product", 
         ["business_id"], 
@@ -62,22 +63,23 @@ def get_products_info(
 
 def get_specific_product_info(
         business_id: str,
-        product_id: str | None = None,
-        product_name: str | None = None,
+        product_id: str,
+        product_name: str,
 ):
     """
+    Specialized Customer Service Agent Tool.
     Get details of a specific product by searching, either by the product's id, or the name provided.
 
     Args:
         business_id (str): the id of the business to search for (in string format).
-        (optional) product_id (str): the id of the product to search for.
-        (optional) product_name (str): the name of the product.
+        (optional) product_id (str): the id of the product to search for. You can choose to pass an empty string for this parameter if no value is available.
+        (optional) product_name (str): the name of the product. You can choose to pass an empty string for this parameter if no value is available.
         Note: Either the product_id or product_name must be provided, both cannot be empty.
     Returns:
-        A list of dictionaries, each representing a product with matching name/id, with keys: item_name, category, brand, quantity_in_stock, selling_price, and minimum_selling_price.
+        A list of dictionaries, each representing a product with matching name/id, with keys: id, item_name, category, brand, quantity_in_stock, selling_price, and minimum_selling_price.
     """
 
-    cols = ["item_name", "category", "brand", "quantity_in_stock", "selling_price", "minimum_selling_price"]
+    cols = ["id", "item_name", "category", "brand", "quantity_in_stock", "selling_price", "minimum_selling_price"]
 
     if product_id:
         result = get_rows_with_exact_column_values(
@@ -117,6 +119,7 @@ def get_customer_details(
         username: str
 ):
     """
+    Specialized Customer Service Agent Tool.
     Get details of a customer.
 
     Args:
@@ -135,7 +138,10 @@ def get_customer_details(
     if isinstance(result, str):
         return result
     else:
-        return {cols[i]: result[0][i] for i in range(len(cols))}
+        if result:
+            return {cols[i]: result[0][i] for i in range(len(cols))}
+        else:
+            return "Customer record not found"
 
 
 def upload_customer_details(
@@ -143,14 +149,15 @@ def upload_customer_details(
         name: str,
         age: int,
         gender: str,
-        contact_details,
+        contact_details: str,
 ):
     """
+    Specialized Customer Service Agent Tool.
     Uploads details of a customer to the database
 
     Args:
         username (str): the telegram username of the customer.
-        name (str): the first and last name of the customer.
+        name (str): the name of the customer.
         age (int): the age of the customer.
         gender (str): the gender of the customer (as M for male or F for female).
         contact_details (str): the phone number or other contact detail of the customer.
@@ -159,6 +166,7 @@ def upload_customer_details(
     """
     tbl_name = "customer"
     cols = ["username", "name", "age", "gender", "contact_details"]
+    cols = f"({', '.join(cols)})"
     values = (username, name, age, gender, contact_details)
     values_fmt = "%s, %s, %s, %s, %s"
     result = insert(tbl_name, cols, values, values_fmt)
@@ -171,6 +179,7 @@ def get_customer_visits(
         start_date: str,
 ):
     """
+    Specialized Customer Service Agent Tool.
     Gets information of a customer's visits up to a certain timestamp
     
     Args:
@@ -178,10 +187,10 @@ def get_customer_visits(
         customer_id (str): the id of the customer in the database.
         start_date (str): the date to filter from, in the format YYYY-mm-dd.
     Returns:
-        A list of dictionaries, each representing a customer visit, with keys: date_of_visit, summary, and orders_made.
+        A list of dictionaries, each representing a customer visit, with keys: date_of_visit, visit_summary, and orders_made.
     """
 
-    cols = ["date_of_visit", "summary", "orders_made"]
+    cols = ["date_of_visit", "visit_summary", "orders_made"]
     query = f"SELECT {', '.join(cols)} FROM visit WHERE business_id = %s AND customer_id = %s AND date_of_visit >= %s"
     try:
         cursor.execute(query, (business_id, customer_id, start_date))
@@ -199,16 +208,17 @@ def get_all_customer_visits(
         customer_id: str
 ):
     """
+    Specialized Customer Service Agent Tool.
     Gets records of all the customer's visits
     
     Args:
         business_id (str): the id of the business to search for (in string format).
         customer_id (str): the id of the customer in the database.
     Returns:
-        A list of dictionaries, each representing a customer visit, with keys: date_of_visit, summary, and orders_made.
+        A list of dictionaries, each representing a customer visit, with keys: date_of_visit, visit_summary, and orders_made.
     """
 
-    cols = ["date_of_visit", "summary", "orders_made"]
+    cols = ["date_of_visit", "visit_summary", "orders_made"]
     result = get_rows_with_exact_column_values(
         "visit", 
         ["business_id", "customer_id"], 
@@ -231,6 +241,7 @@ def log_customer_visit(
         orders_made: int,
 ):
     """
+    Specialized Customer Service Agent Tool.
     Upload details of a customer's visit, including datetime of visit, summary of queries made, and number of order(s) made (if any)
 
     Args:
@@ -244,6 +255,7 @@ def log_customer_visit(
 
     tbl_name = "visit"
     cols = ["customer_id", "business_id", "date_of_visit", "visit_summary", "orders_made"]
+    cols = f"({', '.join(cols)})"
     time_of_visit = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     values = (customer_id, business_id, time_of_visit, summary, orders_made)
     values_fmt = "%s, %s, %s, %s, %s"
@@ -257,6 +269,7 @@ def get_customer_orders(
         start_date: str
 ):
     """
+    Specialized Customer Service Agent Tool.
     Get the records of a customer's orders, up to a certain timestamp
     
     Args:
@@ -264,10 +277,10 @@ def get_customer_orders(
         customer_id (str): the id of the customer in the database.
         start_date (str): the date to filter from, in the format YYYY-mm-dd.
     Returns:
-        A list of dictionaries, each representing a customer visit, with keys: product_id, quantity_ordered, discount_factor, and date_ordered.
+        A list of dictionaries, each representing a customer visit, with keys: product_id, quantity_ordered, discount_factor, order_status, and date_ordered.
     """
 
-    cols = ["product_id", "quantity_ordered", "discount_factor", "date_ordered"]
+    cols = ["product_id", "quantity_ordered", "discount_factor", "order_status", "date_ordered"]
     query = f"SELECT {', '.join(cols)} FROM customer_order WHERE business_id = %s AND customer_id = %s AND date_ordered >= %s"
     try:
         cursor.execute(query, (business_id, customer_id, start_date))
@@ -285,16 +298,17 @@ def get_all_customer_orders(
         customer_id: str
 ):
     """
+    Specialized Customer Service Agent Tool.
     Get all records of a customer's orders
     
     Args:
         business_id (str): the id of the business to search for (in string format).
         customer_id (str): the id of the customer in the database.
     Returns:
-        A list of dictionaries, each representing a customer's order, with keys: product_id, quantity_ordered, discount_factor, and date_ordered.
+        A list of dictionaries, each representing a customer's order, with keys: product_id, quantity_ordered, discount_factor, order_status, and date_ordered.
     """
 
-    cols = ["product_id", "quantity_ordered", "discount_factor", "date_ordered"]
+    cols = ["product_id", "quantity_ordered", "discount_factor", "order_status", "date_ordered"]
     result = get_rows_with_exact_column_values(
         "customer_order", 
         ["business_id", "customer_id"], 
@@ -318,6 +332,7 @@ def upload_customer_order(
         discount_factor: float
 ):
     """
+    Specialized Customer Service Agent Tool.
     Upload details of a customer's order to the database
     
     Args:
@@ -330,15 +345,20 @@ def upload_customer_order(
         A response notifying whether or not record upload was successful.
     """
 
-    tbl_name = "visit"
-    cols = ["customer_id", "business_id", "product_id", "quantity_ordered", "discount_factor", "date_ordered"]
+    tbl_name = "customer_order"
+    cols = ["customer_id", "business_id", "product_id", "quantity_ordered", "discount_factor", "order_status", "date_ordered"]
+    cols = f"({', '.join(cols)})"
     time_of_order = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    values = (customer_id, business_id, product_id, quantity_ordered, discount_factor, time_of_order)
+    values = (customer_id, business_id, product_id, quantity_ordered, discount_factor, "pending", time_of_order)
     values_fmt = "%s, %s, %s, %s, %s, %s"
     result = insert(tbl_name, cols, values, values_fmt)
+    return result
 
 
-# print(get_business_info("1"))
-# print(get_products_info("1"))
-# print(get_specific_product_info("1", product_name="Toothbrush"))
-# print(get_specific_product_info("1", product_id="3"))
+if __name__ == "__main__":
+    print(get_business_info("1"))
+    # print(type(get_business_info("1")["date_joined"]))
+    # print(type(get_products_info("1")))
+    # print(get_specific_product_info("1", product_name="Toothbrush"))
+    # print(get_specific_product_info("1", product_id="3"))
+    pass
