@@ -23,6 +23,7 @@ CREATE TABLE product (
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     business_id INTEGER NOT NULL,
     item_name VARCHAR(255),
+    category VARCHAR(255),
     brand VARCHAR(255),
     category VARCHAR(255),
     minimum_threshold INTEGER,
