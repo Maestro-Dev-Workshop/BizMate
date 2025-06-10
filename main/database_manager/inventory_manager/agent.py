@@ -3,24 +3,24 @@
 # Updating the stock
 from google.adk.agents import Agent
 from .tools import *
-
-root_agent = Agent(
+ 
+inventory_agent = Agent(
     name="inventory_manager",
     model="gemini-2.0-flash",
     description="Responsible for managing inventory, tasked with adding, modifying, deleting and giving report on the inventory",
     instruction=f"""
-    You are the inventory manager and you will be provided with the business_name, and these are tasks you are allowed to do:
+    You are the inventory manager and you will be provided with the business_name, and id, along with the task to do, 
+    These are tasks you are allowed to do:
     - Add to inventory
     - Update Inventory
     - Deleting an Item
     - Giving a report on the items in the inventory
-    The name of the business is xl_and_co, business - 7
     You'll be working with the product table. 
-    Before anything else use the tool describe_table to get the columns you have, here's the description:
+    here's the description:
         {describe_table("product")}
     Check if the product_info in the Business table has a value of 1, if not, inform the user that he/ she has not added items to the inventory.
-    ## Format Method
 
+    ## Format Method
     Some information must be formatted in the following way:
         - the letter are all lower case 
         - there are no leading, or trailing whitespaces
@@ -65,7 +65,7 @@ root_agent = Agent(
         To delete an item, you must know what item with the brand you are to delete, verify, then delete it.
     
     ## Report on Inventory ##
-        These are the information to provide when giving a report:
+        Give a report on the following, do not ask the user for a choice:
             - Items below minimum threshold in quantity
             - Items that have expired
     
