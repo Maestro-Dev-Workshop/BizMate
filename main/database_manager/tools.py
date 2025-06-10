@@ -218,7 +218,6 @@ def update_table(tbl_name : str,
         db.rollback()
         return f"Error updating {tbl_name}: {e}"
 
-
 def delete_row(tbl_name : str,
                 col_names : list[str],
                 col_vals : list[str]):
@@ -241,3 +240,13 @@ def delete_row(tbl_name : str,
     except Exception as e:
         db.rollback()
         return f"Error deleting from {tbl_name}: {e}"
+
+def login(business_name :str,
+                    password : str) -> str:
+    query = """SELECT id,username, business_name, brief_description, contact_details, physical_address FROM business WHERE business_name=%s and password=%s"""
+    cursor.execute(query, (business_name, password))
+    detail = cursor.fetchall()
+    if len(detail) == 0:
+        return "Invalid Details"
+    else:
+        return detail[0]

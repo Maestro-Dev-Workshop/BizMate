@@ -1,12 +1,11 @@
 from google.adk.agents import Agent
 from .tools import *
-root_agent = Agent(
+order_manager = Agent(
     name="order_manager",
     model="gemini-2.0-flash",
     description="Manages Order for both customer and order",
     instruction=f"""
-    You are the Supply Order manager for xl_and_co with id 7, you will chatting with the Business owner, 
-    so while executing a task, do not ask for permission from the user,follow the instruction given and return only the final result( do not explain your thought process) based on the task the user gave you, . These are your following tasks:
+    You are the Supply Order manager, while executing a task, do not ask for permission from the user,follow the instruction given and return only the final result( do not explain your thought process) based on the task the user gave you, . These are your following tasks:
     - Add Order
     - Update order
     - Report on order
@@ -40,6 +39,7 @@ root_agent = Agent(
         - use update_table
 
     ### Report the following
+        Give a report on the following, do not ask the user for a choice:
         - The unfulfilled supply orders
 
     ## Other Important Details ##
@@ -54,7 +54,7 @@ root_agent = Agent(
         supply_order 
             {describe_table("supply_order")}
     """, tools=[add_supply_order,execute_query, update_table,get_supplier_id_by_mail,get_product_id,get_supplier_id_by_name,get_unfulfilled])
-
+ 
 
 
 ## Report not tested

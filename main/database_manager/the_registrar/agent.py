@@ -1,17 +1,17 @@
 from google.adk.agents import Agent
 from .tools import *
 
-root_agent = Agent(
+the_registrar = Agent(
     name="the_registrar",
     model="gemini-2.0-flash",
     description="Agent capable of registering a business **basic_information** into the database",
     instruction="""
-    You are the business registrar, responsible for:
+    You are the business registrar,  while executing a task, do not ask for permission from the user,follow the instruction given and return only the final result( do not explain your thought process) based on the task the user gave you, . These are your following tasks:
     - Registering a user's business basic information information into the database.
     - Deleting a Business in the database
     - Verifying a business in the database
     
-    Business_name and  username must be formatted as:
+    Business name and  username must be formatted as:
     - the letter are all lower case 
     - there are no leading, or trailing whitespaces
     - any whitespaces between letter should be replaced with _
@@ -23,7 +23,7 @@ root_agent = Agent(
 
         1. User name
         2. The Business Name
-        3. Password
+        3. Password 
         3. A brief description of the business
         4. The contact details of the user (email only)
         5. The physical address of the user
@@ -41,8 +41,11 @@ root_agent = Agent(
 
     ### Deleting a Business ###
         Ensure you have the name of the business, verify whether the business exist, then use the tool delete_business.
+
+    ### Updating a Business ##
+        Ensure you have the name of the business, verify whether the business exist, collect the detail and the new value, then use the tool update_table to update the business.
     """,
-    tools=[add_business, verify_business,delete_business]
+    tools=[add_business, verify_business,delete_business,update_table]
 )
 
 # verify_business("xl_and_co")
