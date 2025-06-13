@@ -25,11 +25,12 @@ customer_service_agent = Agent(
 
         # Chatbot services
         ## Instruction
-        When acting as a chatbot and answering customer questions about a business, you will be provided with basic information about the business and its products/services.
+        When acting as a chatbot and answering customer questions about a business, you will be provided with basic information about the business and its products/services. The price of all the products is in Naira.
         Make sure that any information you give the customer about the business must be factual (come from the knowledge base).
         Do not give the customer any information about the business that is not provided in the knowledge base.
         Also, do not tell the customer about the product's "minimum_selling_price" unless he/she asks for a discount when ordering.
-        Only ask for customer details when they're making an order.
+        If the customer's telegram username is unavailable, be sure to ask for it immediately, otherwise use the provided telegram username to search for the customer in the database.
+        Only ask for other customer details when they're making an order, provided the database doesn't already posses those details.
         Only give general information about the business and its products, details of the customer's own visits, and details of the customer's own orders. Do not give the customer any other information.
         
         # Ordering system
@@ -56,47 +57,60 @@ customer_service_agent = Agent(
 )
 
 
-async def main():
-    session_service = InMemorySessionService()
+async def create_session(app_name, user_id, session_id, session_service):
+    session = await session_service.create_session(
+        app_name=app_name,
+        user_id=user_id,
+        session_id=session_id,
+    )
+    print(f"Session created: APP_NAME={app_name}, USER_ID={user_id}, SESSION_ID={session_id}")
 
+    return session
+
+async def get_session(app_name, user_id, session_id, session_service):
+    session = await session_service.get_session(
+        app_name=app_name,
+        user_id=user_id,
+        session_id=session_id
+    )
+
+    return session
+
+def create_runner(app_name, session_service):
+    runner = Runner(
+        agent=customer_service_agent,
+        app_name=app_name,
+        session_service=session_service
+    )
+
+    return runner
+
+async def call_agent_async(query: str, runner, user_id, session_id):
+    # print(f"\n>>> User Query: {query}")
+
+    content = types.Content(role='user', parts=[types.Part(text=query)])
+    final_response_text = "Agent did not produce a final response."
+
+    async for event in runner.run_async(user_id=user_id, session_id=session_id, new_message=content):
+        # print(f"  [Event] Author: {event.author}, Type: {type(event).__name__}, Final: {event.is_final_response()}, Content: {event.content}")
+
+        if event.is_final_response():
+            if event.content and event.content.parts:
+                final_response_text = event.content.parts[0].text
+            elif event.actions and event.actions.escalate:
+                final_response_text = f"Agent escalated: {event.error_message or 'No specific message.'}"
+            break
+
+    return final_response_text
+
+async def main():
     APP_NAME = "bizmate_test_app"
     USER_ID = "user_1"
     SESSION_ID = "session_001"
 
-    session = await session_service.create_session(
-        app_name=APP_NAME,
-        user_id=USER_ID,
-        session_id=SESSION_ID,
-    )
-    print(f"Session created: APP_NAME={APP_NAME}, USER_ID={USER_ID}, SESSION_ID={SESSION_ID}")
-
-
-    runner = Runner(
-        agent=customer_service_agent,
-        app_name=APP_NAME,
-        session_service=session_service
-    )
-    print(f"Runner created for agent '{runner.agent.name}'.")
-
-
-    async def call_agent_async(query: str, runner, user_id, session_id):
-        # print(f"\n>>> User Query: {query}")
-
-        content = types.Content(role='user', parts=[types.Part(text=query)])
-        final_response_text = "Agent did not produce a final response."
-
-        async for event in runner.run_async(user_id=user_id, session_id=session_id, new_message=content):
-            # print(f"  [Event] Author: {event.author}, Type: {type(event).__name__}, Final: {event.is_final_response()}, Content: {event.content}")
-
-            if event.is_final_response():
-                if event.content and event.content.parts:
-                    final_response_text = event.content.parts[0].text
-                elif event.actions and event.actions.escalate:
-                    final_response_text = f"Agent escalated: {event.error_message or 'No specific message.'}"
-                break
-
-        return final_response_text
-    
+    session_service = InMemorySessionService()
+    session = await create_session(APP_NAME, USER_ID, SESSION_ID, session_service)
+    runner = create_runner(APP_NAME, session_service)
 
     async def run_conversation():
         business_id = "1"

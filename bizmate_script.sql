@@ -25,7 +25,6 @@ CREATE TABLE product (
     item_name VARCHAR(255),
     category VARCHAR(255),
     brand VARCHAR(255),
-    category VARCHAR(255),
     minimum_threshold INTEGER,
     quantity_in_stock INTEGER,
     selling_price DECIMAL,
