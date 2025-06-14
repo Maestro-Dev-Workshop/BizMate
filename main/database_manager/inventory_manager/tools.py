@@ -16,7 +16,7 @@ def add_item(
         expiry_dates: list[list[str]],
         metadata : list[list[str]]
 ) -> dict:
-    """
+    f"""
     Adds products to the products table
 
     Args:
@@ -31,6 +31,8 @@ def add_item(
     expiry_date(list[list[str]]) : list of lists, in which for each list contains the expiry date for an item
     metadata(list[list[str]]) : list of lists, in which for each list contains other information about an item.
 
+    business_name, item_names, categories and brands must be formatted in the following way:
+    {params_format()}
     Returns
     A dict containing whether an item with a specific brand was added to the database
     

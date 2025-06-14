@@ -7,7 +7,7 @@ def add_supplier(business_name:str,
                 name:str,
                 contact_det: str, 
                 ) -> dict:
-    """
+    f"""
     Add supplier details to the database
 
     Args:
@@ -15,6 +15,8 @@ def add_supplier(business_name:str,
         name(str): Name of the supplier
         contact_det(str): the contact details of the supplier
 
+    business_name and name value must be formatted in the following way:
+     {params_format()}
     Returns:
         a dictionary which states whether an operation was successful of not
     """
@@ -32,13 +34,15 @@ def add_supplier(business_name:str,
 
 def get_supplier_id_by_mail(business_name:int,
                 name: str) -> int:
-    """
+    f"""
     Returns supplier id
 
     Args:
         business_name (str): name of the business
         name(str): Name of the supplier
-        name(str): the name of the supplier
+    
+    business_name and name value must be formatted in the following way:
+     {params_format()}
         
     Returns:
         the supplier id, returns -1 if not found
@@ -53,8 +57,6 @@ def get_supplier_id_by_mail(business_name:int,
         return supplier_id[0][0]
     else:
         return -1
-
-
 
 def get_supplier_inv_id(supplier_id : int,
                         product_id : int) -> int:
@@ -74,11 +76,17 @@ def get_product_id(
         business_id:int,
         product:str,
         brand:str) -> int:
-    """Gets the id for a product
+    f"""Gets the id for a product
     Args:
         business_id(str): Business id
         product(str): name of the product
         brand(str) : brand of the product
+
+    product and brand value must be formatted in the following way:
+     {params_format()}
+    
+    Returns:
+        id of the product, -1 if not found
     """
     query = """SELECT id FROM product WHERE business_id=%s AND item_name= %s AND brand =%s"""
     cursor.execute(query, (business_id,product, brand))
@@ -96,17 +104,19 @@ def add_to_supplier_inv(
                 product_brands: list[list[str]],
                 cost_prices: list[list[int]],
                 available:list[list[bool]]) -> dict:
-    """
+    f"""
     Add supplier details to the database
 
     Args:
-        name(str): Name of the business
-        contact_det(str): the contact_detail of the supplier
+        business_name(str): Name of the business
+        contact_detail(str): the contact_detail of the supplier
         product_names(str): a list containing names of the products the supplier supplies
         product_brands (list[list[str]]): a list of list containing brands of the products the supplier supplies
         cost_prices(list[list(str)]): a list of list containing cost prices of items by brands of the products
         available(list[list[bool]]): a list of list containing a product by brand is availability
 
+    The values of business_name, product_names, product_brands must be formatted in the following way:
+    {params_format()}
     Returns:
         a dictionary which states whether an operation was successful of not
     """
@@ -136,7 +146,7 @@ def add_supplier_and_suppier_inv(
         product_brands: list[list[str]],
         cost_prices: list[list[int]],
         available:list[list[bool]]) -> dict:
-    """
+    f"""
     Adds to both supplier and supplier inventory
 
     Args:
@@ -147,7 +157,9 @@ def add_supplier_and_suppier_inv(
         product_brands (list[list[str]]): a list of list containing brands of the products the supplier supplies
         cost_prices(list[list(str)]): a list of list containing cost prices of items by brands of the products
         available(list[list[bool]]): a list of list containing a product by brand is availability
-
+    
+    The values of business_name, supplier_name, product_names, product_brands must be formatted in the following way:
+    {params_format}
     Returns:
         a dictionary which states whether an operation was successful of not
     """
@@ -160,20 +172,4 @@ def get_no_suppliers() -> str:
         FROM product p
         LEFT JOIN supplier_inventory si ON p.id = si.product_id
         WHERE si.supplier_id IS NULL;""")
-    return f"""{cursor.fetchall()}"""
-
-def get_unfulfilled() -> str:
-    cursor.execute("""SELECT 
-        so.id AS order_id,
-        b.business_name,
-        p.item_name,
-        s.name AS supplier_name,
-        so.quantity_ordered,
-        so.date_ordered
-    FROM supply_order so
-    JOIN business b ON so.business_id = b.id
-    JOIN product p ON so.product_id = p.id
-    JOIN supplier s ON so.supplier_id = s.id
-    WHERE so.fulfilled = FALSE;
-    """)
     return f"""{cursor.fetchall()}"""

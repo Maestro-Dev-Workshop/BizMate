@@ -21,13 +21,6 @@ supply_agent = Agent(
     Return only the final response
 
     You'll be working with the supplier and supplier_inventory table on MySQL database. 
-    The information on name of business, supplier name, items supplied and brand should be formatted in the following way when used in any tool:
-        - the letter are all lower case 
-        - there are no leading, or trailing whitespaces
-        - replace any whitespaces with `_`, e.g, S and tr -> s_and_tr
-        - convert plural words to singular
-    
-    The details should only be formatted when calling a tool, but the default text should be shown to the user and do not inform the user about any formatted text
 
     ## Basic Management ###
         ### Add Supplier Info
@@ -40,23 +33,21 @@ supply_agent = Agent(
             - Does the supplier have the item or it is out of stock
 
             After collecting the required information:
-                - Verify if such items with such brand exist in the product table using get_rows_with_exact_column_values.If it doesn't exist, inform the user
-                - Show the users all the information you collected for confirmation
+                - Verify if such items with such brand exist in the product table using get_rows_with_exact_column_values.
+                - If the item with brand doesn't exist, inform the user, that such product hasn't been added it to the inventory
                 - Use add_supplier_and_supplier_inv to add both supplier and supplier inventory to the database
-                - If the information was confirmed, add it to the database
 
-            After the adding to the table, verify if the supplier_info column in the business table has a value 1, if not update the value to 1
             The user might also ask what Items does not a supplier yet:
             - Use get_no_suppliers tool to get items to get the items that does not have suppliers
 
         ### Update Supplier Info
             You can also update user information, the following information
-                - Item name along with the brand name (to be formatted)
-                - The supplier name (to be formatted)
+                - Item name along with the brand name
+                - The supplier name
                 - the detail to update 
-                - the new value (to be formatted)
+                - the new value
 
-            Verify the item exist with the brand name and ensure you know what table you're updating,then, ensure the new value for the detail follows the requirement, then you can proceed to update the table
+            Verify the item exist with the brand name and ensure you know which table you're updating,then proceed to update the table
 
         ## Deleting an Item ##
             To delete an item, you must know what item with the brand, along with the supplier info, verify, then delete it.
@@ -64,9 +55,11 @@ supply_agent = Agent(
  
 
         ## Report on Inventory ##
+        Before giving a report check if the user have suppliers in the inventory, if there are no supplier, report that only, if suppliers exist report the following:
         Give a report to the user on the following, do not ask the user to choose:
             - Items that doesn't have supplier
-            -  Items that are out of stock from the suppliers the user have(use execute_query), only generate this if the supplier_info value business table is 1, use the tool get_single_value, to get supplier_info value and ensure you format it according to instructions
+            - Items that are out of stock from the suppliers the user have(use execute_query)
+        If the output is empty,
 
         ## Other Important Details ##
         product table description
@@ -78,6 +71,5 @@ supply_agent = Agent(
         business description
             {describe_table("business")}
     """,tools=[get_no_suppliers,add_supplier,add_supplier_and_suppier_inv,add_to_supplier_inv,get_supplier_id_by_mail,get_supplier_inv_id,execute_query,delete_row,get_single_value,update_table])
-
 # doesn't format well
 # doesn't give a good report

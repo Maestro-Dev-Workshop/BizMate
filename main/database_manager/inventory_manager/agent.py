@@ -18,16 +18,7 @@ inventory_agent = Agent(
     You'll be working with the product table. 
     here's the description:
         {describe_table("product")}
-    Check if the product_info in the Business table has a value of 1, if not, inform the user that he/ she has not added items to the inventory.
 
-    ## Format Method
-    Some information must be formatted in the following way:
-        - the letter are all lower case 
-        - there are no leading, or trailing whitespaces
-        - any whitespaces between letter should be replaced with _
-        - convert plural words to singular
-    
-    The details should only be formatted when calling a tool, but the default text should be shown to the user and do not inform the user about any formatted text
     ## Add to inventory ##
         Tell the user to provide you with the following information:
         - The list of items to add (to be formatted)
@@ -39,20 +30,16 @@ inventory_agent = Agent(
         - The expiry_date (YYYY-MM-DD)for each item by brand
         - Other information for each item by brand
 
-        You may receive a context containing the business information, extract the details above from the context.
         If any of the details above were not found, inform the user they should provide information for those that were not found.
 
         While collecting the information required:
-        - ensure the item with that brand does not exist in database for that business use get_single_value tool. If it exist, inform the user that the item exist and ask if you should just add the quantity to the existing quantity of items.
+        - ensure the item with that brand does not exist in database for that business use get_single_value tool. If it exist, inform the user that the item exist
         - If the user does not specify a minimum selling price, put in the value of selling price
         - If the expiry_date was not specified, or it doesn't have, it should a default value of 2035-12-31
         
         After receiving all the required information:
         - determine the most appropriate categories for each items listed, for example Phones will have a category electronics, first check all the categories within the system
-        - Show the users all the information you collected for confirmation
-        - If the information was confirmed, add it to the database
-
-        After the adding to the database, verify if the product_info column on table business  has a value 1, if not update the value to 1
+        - After the adding to the database
 
     ## Update Inventory ##
         To update an inventory, the following details are required:
@@ -65,7 +52,8 @@ inventory_agent = Agent(
         To delete an item, you must know what item with the brand you are to delete, verify, then delete it.
     
     ## Report on Inventory ##
-        Give a report on the following, do not ask the user for a choice:
+        Before giving a report check if the user have items in the inventory, if there are no items, report that only, if items exist report the following:
+        Give on report on  all the following, ensure you rephrase and structure the output in such a way that the user can easily understand it, do not ask the user for a choice:
             - Items below minimum threshold in quantity
             - Items that have expired
     

@@ -10,13 +10,6 @@ the_registrar = Agent(
     - Registering a user's business basic information information into the database.
     - Deleting a Business in the database
     - Verifying a business in the database
-    
-    Business name and  username must be formatted as:
-    - the letter are all lower case 
-    - there are no leading, or trailing whitespaces
-    - any whitespaces between letter should be replaced with _
-    - do not inform the user about these formatting and do not display the formatted text, only use the formatted text for tools
-
 
      ### Registering a Business ###
         You must collect the following information and they must be asked all at once but in order:

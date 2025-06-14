@@ -13,7 +13,7 @@ def add_business(
         physical_address: str,
         dob:str,
         password:str) -> str:
-    """Adds a business basic information to the database
+    f"""Adds a business basic information to the database
     Args:
         name(str): Name of the business owner
         business_name(str): Name of the business
@@ -22,6 +22,9 @@ def add_business(
         physical_address(str): The physical address of the store
         dob(str): User's date of birth in (YYYY-MM-DD)
         password: User's password
+    
+    The values of name, business_name must be formatted in the following way:
+     {params_format()}
     
     Returns: A message stating whether the operation was successful
     """
@@ -33,21 +36,26 @@ def add_business(
     return insert("business", columns, values, fmt)
 
 def delete_business(business_name : str) ->str:
-    """Updates active column to false
+    f"""Updates active column to false
     
     Args:
         business_name(str): Name of the business
     
+    The values of the business_name must be formatted in the following way:
+     {params_format()}
     Returns
         whether the update operation was successful or not
     """
     return update_table("business",["business_name"],[business_name],["active"],[False])
 
 def verify_business(business_name: str) -> str:
-    """Verifies if the business exist then it returns the id
+    f"""Verifies if the business exist then it returns the id
     
     Args:
         business_name(str): name of the business
+    
+    The values of the business_name must be formatted in the following way:
+     {params_format()}
     
     Returns:
         the id of the business if it exists

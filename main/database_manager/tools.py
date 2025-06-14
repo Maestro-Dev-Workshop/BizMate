@@ -44,9 +44,11 @@ def describe_table(table_name: str) -> list[tuple[str, str]]:
         return f"Error: {e}"
 
 def execute_query(sql: str) -> list[list[str]]:
-    """
+    f"""
     General function to execute an SQL statement, returning the results. Can be used to extract useful information.
     
+    If you're dealing with names or contact details or similar columns, ensure it is formatted as:
+        {params_format()}
     Args:
         sql: the query to be executed
     Returns:
@@ -74,6 +76,12 @@ def execute_query_in_str(sql: str) -> list[list[str]]:
         return f"""{cursor.fetchall()}"""
     except Exception as e:
         return f"Error: {e}"
+
+def params_format():
+    return  """- the letter are all lower case 
+            - there are no leading, or trailing whitespaces
+            - any whitespaces between letter should be replaced with _
+            - convert plural words to singular"""
 
 # Quam oni werey
 def insert(
@@ -107,7 +115,11 @@ def get_single_value(
     value : str,
     target_col : str
     ):
-    """Returns a single result result of a query
+    f"""Returns a single result result of a query
+
+    If you're dealing with names or contact details or similar columns, ensure it is formatted as:
+        {params_format()}
+
     Args:
         tbl_name: name of the table,
         col_name: name of the column to filter from
@@ -131,9 +143,13 @@ def get_rows_with_exact_column_values(
     values: list[str],
     target_cols: list[str]
     ):
-    """
+    f"""
     Filters records by rows whose values exactly match the provided value in the specified column 
     
+    If you're dealing with names or contact details or similar columns, ensure it is formatted as:
+        {params_format()}
+
+
     Args:
         tbl_name (str): name of the table
         col_names (list[str]): names of the columns to filter from
@@ -163,9 +179,12 @@ def get_rows_with_matching_column_values(
     values: list[str],
     target_cols: list[str]
     ):
-    """
+    f"""
     Filters records by rows whose values having matching pattern to the provided values in the specified columns. Can be used as a searching function
-    
+
+    If you're dealing with names or contact details or similar columns, ensure it is formatted as:
+        {params_format()}
+
     Args:
         tbl_name: name of the table
         col_names: names of the columns to filter from
@@ -195,8 +214,11 @@ def update_table(tbl_name : str,
                 col_vals : list[str],
                 target_cols : list[str],
                 target_vals : list[str]) -> str:
-    """
+    f"""
     General function for updating tables
+
+    If you're dealing with names or contact details or similar columns, ensure it is formatted as:
+        {params_format()}
 
     Args:
         tbl_name(str): Name of the table to update
@@ -221,8 +243,11 @@ def update_table(tbl_name : str,
 def delete_row(tbl_name : str,
                 col_names : list[str],
                 col_vals : list[str]):
-    """
+    f"""
     General function for deleting rows from table
+
+    If you're dealing with names or contact details or similar columns, ensure it is formatted as:
+        {params_format()}
 
     Args:
         tbl_name(str): Name of the table to update
@@ -243,6 +268,20 @@ def delete_row(tbl_name : str,
 
 def login(business_name :str,
                     password : str) -> str:
+    f"""
+    Verifies the details
+    Args:
+
+    business_name(str) : Name of the business
+    password(str) : Password
+
+    Ensure the business_name is formatted in the following way:
+    {params_format()}
+
+    Returns: 
+    whether the detail exist
+
+    """
     query = """SELECT id,username, business_name, brief_description, contact_details, physical_address FROM business WHERE business_name=%s and password=%s"""
     cursor.execute(query, (business_name, password))
     detail = cursor.fetchall()

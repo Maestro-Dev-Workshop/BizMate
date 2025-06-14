@@ -52,7 +52,7 @@ CREATE TABLE customer_order (
     product_id INTEGER NOT NULL,
     business_id INTEGER NOT NULL,
     quantity_ordered INTEGER,
-    discount_factor DECIMAL,
+    sold_price DECIMAL,
     order_status VARCHAR(255),
     date_ordered TIMESTAMP,
     FOREIGN KEY (customer_id) REFERENCES customer(id),
