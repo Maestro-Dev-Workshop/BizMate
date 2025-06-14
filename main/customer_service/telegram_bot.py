@@ -5,7 +5,7 @@ import random
 APP_NAME = "bizmate_test_app"
 LOGS_FOLDER_PATH = "C:\\Code\\Python Projects\\Automata Project\\BizMate\\main\\customer_service\\test_logs"
 
-bot = AsyncTeleBot("8190718341:AAE2khFAdwsofIt_rzzuvPTll9Okvt8wjig")
+bot = AsyncTeleBot(os.environ["BOT_TOKEN"])
 session_service = InMemorySessionService()
 
 def get_usernames(user):
@@ -52,8 +52,8 @@ async def send_welcome_message(message):
     print(agent_initial_response)
 
     user_logs = f"{display_name}'s conversation.txt"
-    with open(os.path.join(LOGS_FOLDER_PATH, user_logs), "w", encoding="utf-8") as file:
-        file.write(initial_prompt + agent_initial_response)
+    with open(os.path.join(LOGS_FOLDER_PATH, user_logs), "a", encoding="utf-8") as file:
+        file.write("\n\nNEW CONVERSATION\n" + initial_prompt + agent_initial_response)
 
     await bot.send_message(message.chat.id, initial_response)
 
