@@ -7,19 +7,6 @@ def add_supplier(business_name:str,
                 name:str,
                 contact_det: str, 
                 ) -> dict:
-    f"""
-    Add supplier details to the database
-
-    Args:
-        business_name (str): name of the business
-        name(str): Name of the supplier
-        contact_det(str): the contact details of the supplier
-
-    business_name and name value must be formatted in the following way:
-     {params_format()}
-    Returns:
-        a dictionary which states whether an operation was successful of not
-    """
     business_id = get_single_value("business", "business_name", business_name, "id")
     supplier_cols = "(business_id, name, contact_details)"
     supp_fmt = "%s, %s, %s"
@@ -34,19 +21,6 @@ def add_supplier(business_name:str,
 
 def get_supplier_id_by_mail(business_name:int,
                 name: str) -> int:
-    f"""
-    Returns supplier id
-
-    Args:
-        business_name (str): name of the business
-        name(str): Name of the supplier
-    
-    business_name and name value must be formatted in the following way:
-     {params_format()}
-        
-    Returns:
-        the supplier id, returns -1 if not found
-    """
     business_id = get_single_value("business", "business_name", business_name, "id")
     cursor.execute("""SELECT id from supplier WHERE business_id=%s AND contact_details=%s""",(business_id,name))
     supplier_id = cursor.fetchall()
@@ -76,18 +50,6 @@ def get_product_id(
         business_id:int,
         product:str,
         brand:str) -> int:
-    f"""Gets the id for a product
-    Args:
-        business_id(str): Business id
-        product(str): name of the product
-        brand(str) : brand of the product
-
-    product and brand value must be formatted in the following way:
-     {params_format()}
-    
-    Returns:
-        id of the product, -1 if not found
-    """
     query = """SELECT id FROM product WHERE business_id=%s AND item_name= %s AND brand =%s"""
     cursor.execute(query, (business_id,product, brand))
     try:
@@ -104,22 +66,6 @@ def add_to_supplier_inv(
                 product_brands: list[list[str]],
                 cost_prices: list[list[int]],
                 available:list[list[bool]]) -> dict:
-    f"""
-    Add supplier details to the database
-
-    Args:
-        business_name(str): Name of the business
-        contact_detail(str): the contact_detail of the supplier
-        product_names(str): a list containing names of the products the supplier supplies
-        product_brands (list[list[str]]): a list of list containing brands of the products the supplier supplies
-        cost_prices(list[list(str)]): a list of list containing cost prices of items by brands of the products
-        available(list[list[bool]]): a list of list containing a product by brand is availability
-
-    The values of business_name, product_names, product_brands must be formatted in the following way:
-    {params_format()}
-    Returns:
-        a dictionary which states whether an operation was successful of not
-    """
     inv_cols = "(product_id,supplier_id,cost_price,available)"
     inv_fmt = "%s, %s, %s, %s"
     message = {}
@@ -146,23 +92,6 @@ def add_supplier_and_suppier_inv(
         product_brands: list[list[str]],
         cost_prices: list[list[int]],
         available:list[list[bool]]) -> dict:
-    f"""
-    Adds to both supplier and supplier inventory
-
-    Args:
-        business_name(str): Name of the business
-        supplier_name(str): Name of the supplier
-        contact_det(str): the contact details of the supplier
-        product_names(str): a list containing names of the products the supplier supplies
-        product_brands (list[list[str]]): a list of list containing brands of the products the supplier supplies
-        cost_prices(list[list(str)]): a list of list containing cost prices of items by brands of the products
-        available(list[list[bool]]): a list of list containing a product by brand is availability
-    
-    The values of business_name, supplier_name, product_names, product_brands must be formatted in the following way:
-    {params_format}
-    Returns:
-        a dictionary which states whether an operation was successful of not
-    """
     message = add_supplier(business_name,supplier_name,contact_det) | add_to_supplier_inv(business_name,contact_det,product_names,product_brands,cost_prices,available)
     return message
 
@@ -173,3 +102,82 @@ def get_no_suppliers() -> str:
         LEFT JOIN supplier_inventory si ON p.id = si.product_id
         WHERE si.supplier_id IS NULL;""")
     return f"""{cursor.fetchall()}"""
+
+
+add_supplier.__doc__ = f"""
+    Add supplier details to the database
+
+    The value of `business_name` and `name` must be formatted in the following way:
+        {params_format()}
+    Args:
+        business_name (str): name of the business
+        name(str): Name of the supplier
+        contact_det(str): the contact details of the supplier
+
+    Returns:
+        a dictionary which states whether an operation was successful of not
+    """
+get_supplier_id_by_mail.__doc__ = f"""
+    The value of `business_name` and `name` value must be formatted in the following way:
+        {params_format()}
+
+    Returns supplier id
+
+    Args:
+        business_name (str): name of the business
+        name(str): Name of the supplier
+
+
+    Returns:
+        the supplier id, returns -1 if not found
+    """
+
+get_supplier_inv_id.__doc__ = """
+    Returns inventory id of the suppliers
+    """
+
+get_product_id.__doc__ = f"""Gets the id for a product
+    The values of `product` and `brand` must be formatted in the following way:
+        {params_format()}
+    Args:
+        business_id(str): Business id
+        product(str): name of the product
+        brand(str) : brand of the product
+
+    Returns:
+        id of the product, -1 if not found
+    """
+
+add_to_supplier_inv.__doc__ = f"""
+    Add supplier details to the database
+
+    The values of `business_name`, `product_names`, `product_brands` must be formatted in the following way:
+        {params_format()}
+    Args:
+        business_name(str): Name of the business
+        contact_detail(str): the contact_detail of the supplier
+        product_names(str): a list containing names of the products the supplier supplies
+        product_brands (list[list[str]]): a list of list containing brands of the products the supplier supplies
+        cost_prices(list[list(str)]): a list of list containing cost prices of items by brands of the products
+        available(list[list[bool]]): a list of list containing a product by brand is availability
+
+    Returns:
+        a dictionary which states whether an operation was successful of not
+    """
+
+add_supplier_and_suppier_inv.__doc__ = f"""
+    Adds to both supplier and supplier inventory
+    The values of `business_name`, `supplier_name`, `product_names`, `product_brands` must be formatted in the following way:
+        {params_format}
+    Args:
+        business_name(str): Name of the business
+        supplier_name(str): Name of the supplier
+        contact_det(str): the contact details of the supplier
+        product_names(str): a list containing names of the products the supplier supplies
+        product_brands (list[list[str]]): a list of list containing brands of the products the supplier supplies
+        cost_prices(list[list(str)]): a list of list containing cost prices of items by brands of the products
+        available(list[list[bool]]): a list of list containing a product by brand is availability
+
+    Returns:
+        a dictionary which states whether an operation was successful of not
+    """

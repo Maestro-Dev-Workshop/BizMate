@@ -12,10 +12,7 @@ CREATE TABLE business (
     physical_address VARCHAR(255),
     date_of_birth DATE,
     active BOOLEAN,
-    password VARCHAR(15),
-    basic_info BOOLEAN,
-    product_info BOOLEAN,
-    supplier_info BOOLEAN
+    password VARCHAR(15)
 );
 
 -- Table: products
@@ -83,7 +80,7 @@ CREATE TABLE supply_order (
     business_id INTEGER NOT NULL,
     supplier_id INTEGER NOT NULL,
     quantity_ordered INTEGER,
-    fufilled BOOLEAN,
+    fulfilled BOOLEAN,
     date_ordered TIMESTAMP,
     FOREIGN KEY (product_id) REFERENCES product(id),
     FOREIGN KEY (business_id) REFERENCES business(id),
