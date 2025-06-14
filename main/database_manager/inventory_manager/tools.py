@@ -16,8 +16,32 @@ def add_item(
         expiry_dates: list[list[str]],
         metadata : list[list[str]]
 ) -> dict:
-    """
+    business_id = get_single_value("business", "business_name", business_name, "id")
+    cols = (brands, quantities, min_thresholds, sps, min_selling_prices, expiry_dates, metadata)
+    expiry_dates = [[datetime.datetime.strptime(exp, "%Y-%m-%d").date() for exp in sublist] for sublist in expiry_dates]
+    columns = "(business_id, item_name, brand, category, quantity_in_stock, minimum_threshold, selling_price, minimum_selling_price, expiry_date, metadata)"
+    fmt = fmt = "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s"
+    message = {}
+    for ind in range(len(item_names)):
+        for sub_ind in range(len(brands[ind])):
+            row = [business_id, item_names[ind], categories[ind]] + [col[ind][sub_ind] for col in cols]
+            message[f"{item_names[ind]}, brand: {brands[ind][sub_ind]}"] = insert("product", columns, row, fmt)
+    return message
+
+
+def get_expired_goods(business_name: str):
+    business_id = get_single_value("business", "business_name", business_name, "id")
+    today = datetime.date.today()
+    query = "SELECT * FROM product WHERE expiry_date < %s AND business_id= %s"
+    cursor.execute(query,(today,business_id))
+    return f"Expired Goods : {cursor.fetchall()}"
+
+
+add_item.__doc__ = f"""
     Adds products to the products table
+
+    The values of `business_name`, `item_names`, `categories` and `brands` must be formatted in the following way:
+        {params_format()}
 
     Args:
     business_name(str): name of the business that owns such item
@@ -35,24 +59,16 @@ def add_item(
     A dict containing whether an item with a specific brand was added to the database
     
     """
-    business_id = get_single_value("business", "business_name", business_name, "id")
-    cols = (brands, quantities, min_thresholds, sps, min_selling_prices, expiry_dates, metadata)
-    expiry_dates = [[datetime.datetime.strptime(exp, "%Y-%m-%d").date() for exp in sublist] for sublist in expiry_dates]
-    columns = "(business_id, item_name, brand, category, quantity_in_stock, minimum_threshold, selling_price, minimum_selling_price, expiry_date, metadata)"
-    fmt = fmt = "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s"
-    message = {}
-    for ind in range(len(item_names)):
-        for sub_ind in range(len(brands[ind])):
-            row = [business_id, item_names[ind], categories[ind]] + [col[ind][sub_ind] for col in cols]
-            message[f"{item_names[ind]}, brand: {brands[ind][sub_ind]}"] = insert("product", columns, row, fmt)
-    return message
 
+get_expired_goods.__doc__ = f"""
+Get Expired Goods for a business
 
-def get_expired_goods():
-    today = datetime.date.today()
-    query = "SELECT * FROM product WHERE expiry_date < %s"
-    cursor.execute(query,(today,))
-    return f"Expired Goods : {cursor.fetchall()}"
+The values of `business_name` must be formatted in the following way:
+        {params_format()}
 
+Args:
+    business_name(str): name of the business that owns such item
 
-# print(describe_table("product"))
+Returns
+    A list of expired goods
+"""

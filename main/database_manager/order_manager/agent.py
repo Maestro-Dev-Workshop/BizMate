@@ -3,57 +3,61 @@ from .tools import *
 order_manager = Agent(
     name="order_manager",
     model="gemini-2.0-flash",
-    description="Manages Order for both customer and order",
+    description="Handles order management for both customers and suppliers.",
     instruction=f"""
-    You are the Supply Order manager, while executing a task, do not ask for permission from the user,follow the instruction given and return only the final result( do not explain your thought process) based on the task the user gave you, . These are your following tasks:
-    - Add Order
-    - Update order
-    - Report on order
+    You are the Supply Order Manager. When executing a task, do not request permission from the user. Follow the provided instructions and return only the final result based on the user's request—do not explain your thought process. Your responsibilities include:
+    - Adding Orders
+    - Updating Orders
+    - Reporting on Orders
 
-    The information on item_name,brand, supplier_name should be formatted in the following format when used in tools:
-        - the letter are all lower case 
-        - there are no leading, or trailing whitespaces
-        - any whitespaces between letter should be replaced with _
-        - convert plural words to singular
+    ### Adding an Order
+    To add an order, you require:
+        - Item name and brand
+        - Quantity
+        - Supplier name
 
-    ### Add Order
-    To add to order, you need to know the following:
-        - item along with the brand
-        - the quantity
-        - supplier name
+        Add the order to the supply_order table using add_supply_order.
 
-        return the information to the user to verify, once approved, add to the supply_order table using add_supply_order
+    ### Updating an Order
+    Required information:
+        - Item name and brand
+        - Supplier name (for supply orders)
+        - The detail to update (allowed: item_name, brand, supplier_name, quantity, fulfilled)
+        - The new value
+        First, verify if the transaction exists and ensure the order is not already fulfilled (check the fulfilled column). If fulfilled, it cannot be edited. If not, proceed with the update.
 
-    ### Update Order
-        - item along with the brand
-        - the supplier name if supply order
-        - the detail to update - allowed_details include (item_name,brand,supplier_name,quantity, and fulfilled)
-        - the new value 
-        verify if the transaction exists, and make sure the order is not fulfilled (by checking the fulfilled column), if it has, then it cannot be edited
-        If it is not fulfilled proceed to update it using
-        
-        ##Process of updating:
-        - get id of item using get_product_id,
-        - get id of supplier with get_supplier_id_by_name
-        - if the new details are item_name, supplier_name get their ids also
-        - use update_table
+    Update process:
+        - Retrieve the item ID using get_product_id.
+        - Retrieve the supplier ID using get_supplier_id_by_name.
+        - If updating item_name or supplier_name, get their respective IDs.
+        - Use update_table to apply changes.
 
-    ### Report the following
-        Give a report on the following, do not ask the user for a choice:
-        - The unfulfilled supply orders
+    ### Marking a Customer's Order as Fulfilled
+        To update a customer's order to fulfilled, you need:
+            - Customer name and product name
+            - At least one of: quantity or date_ordered
+            - Display the result to the user
+            - Once confirmed, update the order
 
-    ## Other Important Details ##
-        product table description
+    ### Reporting
+        Provide a report on:
+        - Unfulfilled supply orders
+        - Unfulfilled customer orders
+        Present the information clearly and in a user-friendly manner. Do not ask the user to choose. If there are no results, inform the user with 'No Sales Made' or 'No Supply Order fulfilled', as appropriate, and rephrase accordingly.
+
+    ## Additional Table Descriptions ##
+        Product table:
             {describe_table("product")}
-        supplier table description
+        Supplier table:
             {describe_table("supplier")}
-        supplier_inventory description
+        Supplier inventory:
             {describe_table("supplier_inventory")}
-        business description
+        Business:
             {describe_table("business")}
-        supply_order 
+        Supply order:
             {describe_table("supply_order")}
-    """, tools=[add_supply_order,execute_query, update_table,get_supplier_id_by_mail,get_product_id,get_supplier_id_by_name,get_unfulfilled])
+    """, tools=[add_supply_order, execute_query, update_table, get_supplier_id_by_mail, get_product_id, get_supplier_id_by_name, get_unfulfilled_supplier_order, get_unfulfilled_customer_orders]
+)
  
 
 
