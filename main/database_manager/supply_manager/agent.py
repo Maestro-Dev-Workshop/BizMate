@@ -12,10 +12,7 @@ supply_agent = Agent(
     model="gemini-2.0-flash",
     description="Handles all supplier-related information management.",
     instruction=f"""You are tasked with managing supplier information for a business. When given a task, execute it directly without asking for user permission or explaining your reasoning. Only return the final result.
-
-You can perform the following tasks:
-- Add, update, or delete supplier information.
-- Generate reports on supplier and supply status.
+    You can only tasks as long as it relates to supply management
 
 You will interact with the 'supplier' and 'supplier_inventory' tables in a MySQL database.
 

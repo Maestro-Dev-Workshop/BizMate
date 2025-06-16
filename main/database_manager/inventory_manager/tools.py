@@ -17,10 +17,10 @@ def add_item(
         metadata : list[list[str]]
 ) -> dict:
     business_id = get_single_value("business", "business_name", business_name, "id")
-    cols = (brands, quantities, min_thresholds, sps, min_selling_prices, expiry_dates, metadata)
     expiry_dates = [[datetime.datetime.strptime(exp, "%Y-%m-%d").date() for exp in sublist] for sublist in expiry_dates]
-    columns = "(business_id, item_name, brand, category, quantity_in_stock, minimum_threshold, selling_price, minimum_selling_price, expiry_date, metadata)"
-    fmt = fmt = "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s"
+    cols = (brands, quantities, min_thresholds, sps, min_selling_prices, expiry_dates, metadata)
+    columns = "(business_id, item_name, category, brand, quantity_in_stock, minimum_threshold, selling_price, minimum_selling_price, expiry_date, metadata)"
+    fmt = "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s"
     message = {}
     for ind in range(len(item_names)):
         for sub_ind in range(len(brands[ind])):
@@ -31,10 +31,31 @@ def add_item(
 
 def get_expired_goods(business_name: str):
     business_id = get_single_value("business", "business_name", business_name, "id")
-    today = datetime.date.today()
-    query = "SELECT * FROM product WHERE expiry_date < %s AND business_id= %s"
-    cursor.execute(query,(today,business_id))
+    query = "SELECT * FROM product WHERE expiry_date < CURDATE() AND business_id= %s"
+    cursor.execute(query,(business_id,))
     return f"Expired Goods : {cursor.fetchall()}"
+
+def get_minimum_threshold(business_name: str):
+    """Returns Items below minimum threshold"""
+    business_id = get_single_value("business", "business_name", business_name, "id")
+    query = "SELECT * FROM product WHERE quantity_in_stock <= minimum_threshold AND business_id= %s"
+    cursor.execute(query, (business_id,))
+    return f"Items below minimum threshold: {cursor.fetchall()}"
+
+
+get_expired_goods.__doc__ = f"""Returns Expired Goods
+business_name must be formatted as {params_format}
+
+business_name (str) : Name of the business
+
+"""
+
+get_minimum_threshold.__doc__ = f"""Returns Items below minimum threshold
+business_name must be formatted as {params_format}
+
+business_name (str) : Name of the business
+
+"""
 
 
 add_item.__doc__ = f"""
@@ -72,3 +93,4 @@ Args:
 Returns
     A list of expired goods
 """
+
