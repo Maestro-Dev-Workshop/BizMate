@@ -69,8 +69,9 @@ def params_format():
     return """
     - All letters should be lowercase.
     - Remove any leading or trailing whitespace.
-    - Replace spaces between words with underscores (_).
+    - Replace any spaces between words with underscores (_).
     - For product_name or item_name parameters, convert plural words to their singular form.
+    - For product_name or item_name parameters, do not include any descriptive text, for example granola_bar_(chocolate) -> granola_bar, add the description to the metadata parameter
     """
 
 # Quam oni werey
