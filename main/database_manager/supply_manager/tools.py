@@ -8,10 +8,10 @@ def add_supplier(business_name:str,
                 contact_det: str, 
                 ) -> dict:
     business_id = get_single_value("business", "business_name", business_name, "id")
-    supplier_cols = "(business_id, name, contact_details)"
-    supp_fmt = "%s, %s, %s"
+    supplier_cols = "(business_id, name, contact_details, active)"
+    supp_fmt = "%s, %s, %s, %s"
     message = {}
-    supplier_vals = (business_id,name, contact_det)
+    supplier_vals = (business_id,name, contact_det, 1)
     supplier_id = get_supplier_id_by_mail(business_id,contact_det)
     if (supplier_id == -1):
         message[f"supplier:{name}"] = insert("supplier", supplier_cols, supplier_vals, supp_fmt)
@@ -22,7 +22,7 @@ def add_supplier(business_name:str,
 def get_supplier_id_by_mail(business_name:str,
                 name: str) -> int:
     business_id = get_single_value("business", "business_name", business_name, "id")
-    cursor.execute("""SELECT id FROM supplier WHERE business_id=%s AND contact_details=%s""",(business_id,name))
+    cursor.execute("""SELECT id FROM supplier WHERE business_id=%s AND contact_details=%s AND active=1""",(business_id,name))
     supplier_id = cursor.fetchall()
     cursor.reset()
     if len(supplier_id) > 1:
@@ -35,7 +35,7 @@ def get_supplier_id_by_mail(business_name:str,
 def get_supplier_inv_id(supplier_id : int,
                         product_id : int) -> int:
 
-    cursor.execute("""SELECT * from supplier_inventory WHERE supplier_id=%s AND product_id=%s""",(supplier_id,product_id))
+    cursor.execute("""SELECT * from supplier_inventory WHERE supplier_id=%s AND product_id=%s AND active=1""",(supplier_id,product_id))
     try:
         found = len(cursor.fetchone())
         cursor.reset()
@@ -50,7 +50,7 @@ def get_product_id(
         business_id:int,
         product:str,
         brand:str) -> int:
-    query = """SELECT id FROM product WHERE business_id=%s AND item_name= %s AND brand =%s"""
+    query = """SELECT id FROM product WHERE business_id=%s AND item_name= %s AND brand =%s AND active=1"""
     cursor.execute(query, (business_id,product, brand))
     try:
         product_id = cursor.fetchone()[0]
@@ -66,8 +66,8 @@ def add_to_supplier_inv(
                 product_brands: list[list[str]],
                 cost_prices: list[list[int]],
                 available:list[list[bool]]) -> dict:
-    inv_cols = "(product_id,supplier_id,cost_price,available)"
-    inv_fmt = "%s, %s, %s, %s"
+    inv_cols = "(product_id,supplier_id,cost_price,available,active)"
+    inv_fmt = "%s, %s, %s, %s, %s"
     message = {}
     business_id = get_single_value("business", "business_name", business_name, "id")
     supplier_id = get_supplier_id_by_mail(business_name,contact_detail)
@@ -80,7 +80,7 @@ def add_to_supplier_inv(
             elif get_supplier_inv_id(supplier_id,product_id):
                 message[f"product_id {product} from supplier_id {supplier_id}"] = f"{product}({brand}) already exist"
             else:
-                inv_vals = (product_id, supplier_id, cost_prices[ind][j], available[ind][j])
+                inv_vals = (product_id, supplier_id, cost_prices[ind][j], available[ind][j], 1)
                 message[f"product_id {product} from supplier_id {supplier_id}"] = insert("supplier_inventory",inv_cols,inv_vals,inv_fmt)
     return message
 
@@ -100,7 +100,7 @@ def get_no_suppliers() -> str:
     cursor.execute("""SELECT p.id, p.item_name, p.brand
         FROM product p
         LEFT JOIN supplier_inventory si ON p.id = si.product_id
-        WHERE si.supplier_id IS NULL;""")
+        WHERE si.supplier_id IS NULL AND p.active=1;""")
     return f"""{cursor.fetchall()}"""
 
 def delete_supplier_inv(
@@ -118,7 +118,7 @@ def delete_supplier_inv(
             if product_id == -1:
                 message[f"product_id {product_id} from supplier_id {supplier_id}"] = f"{product}({brand}) not existing on inventory"
             else:
-                message[f"product_id {product_id} from supplier_id {supplier_id}"] = delete_row("supplier_inventory",["product_id","supplier_id"],[product_id,supplier_id])
+                message[f"product_id {product_id} from supplier_id {supplier_id}"] = update_table("supplier_inventory",["product_id","supplier_id"],[product_id,supplier_id],["active"],[0])
     return message
 
 def delete_supplier(business_name:str,
@@ -131,7 +131,7 @@ def delete_supplier(business_name:str,
     if (supplier_id == -1):
         message[f"supplier:{name}"] = "Supplier doesn't exist"
     else:
-        message[f"supplier:{name}"] = delete_row("supplier",["business_id","id"],[business_id,supplier_id])
+        message[f"supplier:{name}"] = update_table("supplier",["business_id","id"],[business_id,supplier_id],["active"],[0])
     return message
 
 def delete_supplier_and_supplier_inv(
@@ -158,6 +158,7 @@ def view_suppliers(business_name : str):
            s.contact_details AS supplier_contact
     FROM supplier s
     JOIN business b ON b.id = %s
+    WHERE s.active=1
     """
     try:
         cursor.execute(query, (business_id,))
@@ -185,7 +186,7 @@ def view_supplier_inventory(business_name :str):
     FROM supplier_inventory si
     JOIN product p ON si.product_id = p.id
     JOIN supplier s ON si.supplier_id = s.id
-    WHERE s.business_id = %s
+    WHERE s.business_id = %s AND s.active=1, si.active=1
     """
     try:
         cursor.execute(query,(business_id,))
@@ -215,7 +216,7 @@ def get_single_supplier_inventory(business_name :str, contact_detail: str):
     FROM supplier_inventory si
     JOIN product p ON si.product_id = p.id
     JOIN supplier s ON s.id = si.supplier_id
-    WHERE s.business_id = %s AND s.id=%s
+    WHERE s.business_id = %s AND s.id=%s AND s.active=1 AND si.active=1
     """
     try:
         cursor.execute(query,(business_id,supplier_id))

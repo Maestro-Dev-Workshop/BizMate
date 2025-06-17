@@ -19,9 +19,9 @@ order_manager = Agent(
     Required information:
         - Item name and brand
         - Supplier name (for supply orders)
-        - The detail to update (allowed: item_name, brand, supplier_name, quantity, fulfilled)
+        - The detail to update (allowed: item_name, brand, supplier_name, quantity, order_status)
         - The new value
-        First, verify if the transaction exists and ensure the order is not already fulfilled (check the fulfilled column). If fulfilled, it cannot be edited. If not, proceed with the update.
+        First, verify if the transaction exists and ensure the order is not already fulfilled (check the order_status column). If fulfilled, it cannot be edited. If not, proceed with the update.
 
     Update process:
         - Retrieve the item ID using get_product_id.

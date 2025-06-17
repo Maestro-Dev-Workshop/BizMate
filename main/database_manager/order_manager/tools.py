@@ -22,7 +22,7 @@ def add_supply_order(
     item_name : str,
     item_brand : str,
     business_name : str,
-    supplier_name : str,
+    supplier_contact_det : str,
     quantity : int,
     supplier_id : int = -1,
 ) -> str:
@@ -31,12 +31,12 @@ def add_supply_order(
     product_id = get_product_id(business_id,item_name,item_brand)
     if product_id == -1:
         return "Product Not Found"
-    supplier_id = get_supplier_id_by_name(business_name,supplier_name) if supplier_id == -1 else supplier_id
+    supplier_id = get_supplier_id_by_mail(business_name,supplier_contact_det) 
     if isinstance(supplier_id,int):
         if supplier_id == -1:
             return "Supplier does not exist"
-        query = """SELECT * FROM supplier_inventory WHERE product_id=%s AND supplier_id=%s"""
-        query_2 = """SELECT * FROM supplier_inventory WHERE product_id=%s AND supplier_id=%s AND available=%s"""
+        query = """SELECT * FROM supplier_inventory WHERE product_id=%s AND supplier_id=%s AND active=1"""
+        query_2 = """SELECT * FROM supplier_inventory WHERE product_id=%s AND supplier_id=%s AND available=%s  AND active=1"""
         
         cursor.execute(query,(product_id,supplier_id))
         output = cursor.fetchall()
@@ -72,7 +72,7 @@ def get_unfulfilled_supplier_order(
     JOIN business b ON so.business_id = %s
     JOIN product p ON so.product_id = p.id
     JOIN supplier s ON so.supplier_id = s.id
-    WHERE so.fulfilled = FALSE;
+    WHERE so.order_status = fulfilled;
     """, (business_id,))
     return f"""{cursor.fetchall()}"""
 
