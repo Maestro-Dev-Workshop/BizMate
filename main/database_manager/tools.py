@@ -111,6 +111,7 @@ def get_single_value(
     try:
         cursor.execute(query, (value,))
         result = cursor.fetchone()
+        cursor.reset()
         return result[0] if result else None
     except Exception as e:
         return f"Error: {e}"

@@ -2,12 +2,11 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from database_manager.tools import *
-
-def add_supplier(business_name:str,
+from database_manager.inventory_manager.tools import view_items
+def add_supplier(business_id:str,
                 name:str,
                 contact_det: str, 
                 ) -> dict:
-    business_id = get_single_value("business", "business_name", business_name, "id")
     supplier_cols = "(business_id, name, contact_details, active)"
     supp_fmt = "%s, %s, %s, %s"
     message = {}
@@ -19,9 +18,8 @@ def add_supplier(business_name:str,
         message[f"supplier:{name}"] = "Supplier already exists"
     return message
 
-def get_supplier_id_by_mail(business_name:str,
+def get_supplier_id_by_mail(business_id:str,
                 name: str) -> int:
-    business_id = get_single_value("business", "business_name", business_name, "id")
     cursor.execute("""SELECT id FROM supplier WHERE business_id=%s AND contact_details=%s AND active=1""",(business_id,name))
     supplier_id = cursor.fetchall()
     cursor.reset()
@@ -60,7 +58,7 @@ def get_product_id(
         return -1
 
 def add_to_supplier_inv(
-                business_name:str,
+                business_id:str,
                 contact_detail:str,
                 product_names: list[str],
                 product_brands: list[list[str]],
@@ -69,8 +67,7 @@ def add_to_supplier_inv(
     inv_cols = "(product_id,supplier_id,cost_price,available,active)"
     inv_fmt = "%s, %s, %s, %s, %s"
     message = {}
-    business_id = get_single_value("business", "business_name", business_name, "id")
-    supplier_id = get_supplier_id_by_mail(business_name,contact_detail)
+    supplier_id = get_supplier_id_by_mail(business_id,contact_detail)
     for ind, product in enumerate(product_names):
         for j,brand in enumerate(product_brands[ind]):
             product_id = get_product_id(business_id,product,brand)
@@ -85,14 +82,14 @@ def add_to_supplier_inv(
     return message
 
 def add_supplier_and_suppier_inv(
-        business_name:str,
+        business_id:str,
         supplier_name:str,
         contact_det:str,
         product_names: list[str],
         product_brands: list[list[str]],
         cost_prices: list[list[int]],
         available:list[list[bool]]) -> dict:
-    message = add_supplier(business_name,supplier_name,contact_det) | add_to_supplier_inv(business_name,contact_det,product_names,product_brands,cost_prices,available)
+    message = add_supplier(business_id,supplier_name,contact_det) | add_to_supplier_inv(business_id,contact_det,product_names,product_brands,cost_prices,available)
     return message
 
 def get_no_suppliers() -> str:
@@ -104,14 +101,13 @@ def get_no_suppliers() -> str:
     return f"""{cursor.fetchall()}"""
 
 def delete_supplier_inv(
-                business_name:str,
+                business_id:str,
                 contact_detail:str,
                 product_names: list[str],
                 product_brands: list[list[str]],
                 ) -> dict:
     message = {}
-    business_id = get_single_value("business", "business_name", business_name, "id")
-    supplier_id = get_supplier_id_by_mail(business_name,contact_detail)
+    supplier_id = get_supplier_id_by_mail(business_id,contact_detail)
     for ind, product in enumerate(product_names):
         for j,brand in enumerate(product_brands[ind]):
             product_id = get_product_id(business_id,product,brand)
@@ -121,13 +117,12 @@ def delete_supplier_inv(
                 message[f"product_id {product_id} from supplier_id {supplier_id}"] = update_table("supplier_inventory",["product_id","supplier_id"],[product_id,supplier_id],["active"],[0])
     return message
 
-def delete_supplier(business_name:str,
+def delete_supplier(business_id:str,
                 name:str,
                 contact_det: str, 
                 ) -> dict:
-    business_id = get_single_value("business", "business_name", business_name, "id")
     message = {}
-    supplier_id = get_supplier_id_by_mail(business_name,contact_det)
+    supplier_id = get_supplier_id_by_mail(business_id,contact_det)
     if (supplier_id == -1):
         message[f"supplier:{name}"] = "Supplier doesn't exist"
     else:
@@ -135,23 +130,22 @@ def delete_supplier(business_name:str,
     return message
 
 def delete_supplier_and_supplier_inv(
-        business_name:str,
+        business_id:str,
         supplier_name:str,
         contact_det:str,
         product_names: list[str],
         product_brands: list[list[str]]) -> dict:
-    message = delete_supplier_inv(business_name,contact_det,product_names,product_brands)
-    message = message | delete_supplier(business_name,supplier_name,contact_det)
+    message = delete_supplier_inv(business_id,contact_det,product_names,product_brands)
+    message = message | delete_supplier(business_id,supplier_name,contact_det)
     return message
 
-def view_suppliers(business_name : str):
+def view_suppliers(business_id : str):
     """
     Retrieves all suppliers with their associated business names and contact details.
 
     Returns:
         list of dict: Each dict contains supplier info (name, contact, business name).
     """
-    business_id = get_single_value("business", "business_name", business_name, "id")
     query = """
     SELECT s.id AS supplier_id,
            s.name AS supplier_name,
@@ -167,14 +161,13 @@ def view_suppliers(business_name : str):
     except Exception as e:
         return f"Error fetching suppliers: {e}"
 
-def view_supplier_inventory(business_name :str):
+def view_supplier_inventory(business_id :str):
     """
     Retrieves supplier inventory including product and supplier information.
 
     Returns:
         list of dict: Each dict contains product name, brand, supplier name, cost price, and availability.
     """
-    business_id = get_single_value("business", "business_name", business_name, "id")
     query = """
     SELECT 
         s.name AS supplier_name,
@@ -186,7 +179,7 @@ def view_supplier_inventory(business_name :str):
     FROM supplier_inventory si
     JOIN product p ON si.product_id = p.id
     JOIN supplier s ON si.supplier_id = s.id
-    WHERE s.business_id = %s AND s.active=1, si.active=1
+    WHERE s.business_id = %s AND s.active=1 AND si.active=1
     """
     try:
         cursor.execute(query,(business_id,))
@@ -195,15 +188,14 @@ def view_supplier_inventory(business_name :str):
     except Exception as e:
         return f"Error fetching supplier inventory: {e}"
 
-def get_single_supplier_inventory(business_name :str, contact_detail: str):
+def get_single_supplier_inventory(business_id :str, contact_detail: str):
     """
     Retrieves supplier inventory including product and supplier information.
 
     Returns:
         list of dict: Each dict contains product name, brand, supplier name, cost price, and availability.
     """
-    business_id = get_single_value("business", "business_name", business_name, "id")
-    supplier_id = get_supplier_id_by_mail(business_name,contact_detail)
+    supplier_id = get_supplier_id_by_mail(business_id,contact_detail)
     query = """
     SELECT 
         s.name AS supplier_name,
@@ -216,7 +208,7 @@ def get_single_supplier_inventory(business_name :str, contact_detail: str):
     FROM supplier_inventory si
     JOIN product p ON si.product_id = p.id
     JOIN supplier s ON s.id = si.supplier_id
-    WHERE s.business_id = %s AND s.id=%s AND s.active=1 AND si.active=1
+    WHERE s.business_id = %s AND s.id=%s AND s.active=1 AND si.active=1;
     """
     try:
         cursor.execute(query,(business_id,supplier_id))
@@ -229,10 +221,8 @@ def get_single_supplier_inventory(business_name :str, contact_detail: str):
 add_supplier.__doc__ = f"""
     Add supplier details to the database
 
-    The value of `business_name` and `name` must be formatted in the following way:
-        {params_format()}
     Args:
-        business_name (str): name of the business
+        business_id (str): id of the business
         name(str): Name of the supplier
         contact_det(str): the contact details of the supplier
 
@@ -241,14 +231,14 @@ add_supplier.__doc__ = f"""
     """
 
 get_supplier_id_by_mail.__doc__ = f"""
-    The value of `business_name` and `name` value must be formatted in the following way:
+    The value of and `name` value must be formatted in the following way:
         {params_format()}
 
     Returns supplier id
 
     Args:
-        business_name (str): name of the business
-        name(str): Name of the supplier
+        business_id (str): id of the business
+        name(str): contact details of the supplier
 
 
     Returns:
@@ -274,10 +264,10 @@ get_product_id.__doc__ = f"""Gets the id for a product
 add_to_supplier_inv.__doc__ = f"""
     Add inventory of supplier to the database
 
-    The values of `business_name`, `product_names`, `product_brands` must be formatted in the following way:
+    The values of, `product_names`, `product_brands` must be formatted in the following way:
         {params_format()}
     Args:
-        business_name(str): Name of the business
+        business_id(str): id of the business
         contact_detail(str): the contact_detail of the supplier
         product_names(str): a list containing names of the products the supplier supplies
         product_brands (list[list[str]]): a list of list containing brands of the products the supplier supplies
@@ -287,10 +277,10 @@ add_to_supplier_inv.__doc__ = f"""
 
 add_supplier_and_suppier_inv.__doc__ = f"""
     Adds to both supplier and supplier inventory
-    The values of `business_name`, `supplier_name`, `product_names`, `product_brands` must be formatted in the following way:
+    The values of `supplier_name`, `product_names`, `product_brands` must be formatted in the following way:
         {params_format}
     Args:
-        business_name(str): Name of the business
+        business_id(str): id of the business
         supplier_name(str): Name of the supplier
         contact_det(str): the contact details of the supplier
         product_names(str): a list containing names of the products the supplier supplies
@@ -305,10 +295,10 @@ add_supplier_and_suppier_inv.__doc__ = f"""
 delete_supplier.__doc__ = f"""
     Deletes supplier details from the database
 
-    The value of `business_name` and `name` must be formatted in the following way:
+    The value of  and `name` must be formatted in the following way:
         {params_format()}
     Args:
-        business_name (str): name of the business
+        business_id (str): id of the business
         name(str): Name of the supplier
         contact_det(str): the contact details of the supplier
 
@@ -320,10 +310,10 @@ delete_supplier_inv.__doc__ = f"""
 
     Deletes an inventory from the supplier to the database
 
-    The values of `business_name`, `product_names`, `product_brands` must be formatted in the following way:
+    The values of `product_names`, `product_brands` must be formatted in the following way:
         {params_format()}
     Args:
-        business_name(str): Name of the business
+        business_id(str): id of the business
         contact_detail(str): the contact_detail of the supplier
         product_names(str): a list containing names of the products the supplier supplies
         product_brands (list[list[str]]): a list of list containing brands of the products the supplier supplies
@@ -333,10 +323,10 @@ delete_supplier_inv.__doc__ = f"""
 
 delete_supplier_and_supplier_inv.__doc__ = f"""
     Deletes from both supplier and supplier inventory
-    The values of `business_name`, `supplier_name`, `product_names`, `product_brands` must be formatted in the following way:
+    The values of `supplier_name`, `product_names`, `product_brands` must be formatted in the following way:
         {params_format}
     Args:
-        business_name(str): Name of the business
+        business_name(str): id of the business
         supplier_name(str): Name of the supplier
         contact_det(str): the contact details of the supplier
         product_names(str): a list containing names of the products the supplier supplies
@@ -348,10 +338,9 @@ delete_supplier_and_supplier_inv.__doc__ = f"""
 view_suppliers.__doc__ = f"""
 Returns the Supplier details a business has
 
-The value of `business_name` parameter must be formatted in the following way:
 
 Args:
-    business_name : The name of the business to filter result
+    business_name : The id of the business to filter result
 
 Returns:
     (supplier_id, supplier_name, supplier_contact)
@@ -360,10 +349,8 @@ Returns:
 view_supplier_inventory.__doc__ =  f"""
 Returns all the Supplier details and the product they supply for a business
 
-The value of `business_name` parameter must be formatted in the following way:
-
 Args:
-    business_name : The name of the business to filter result
+    business_name : The id of the business to filter result
 
 Returns:
     (supplier_name, product_id, item_name, brand, cost_price, availability)
@@ -373,14 +360,9 @@ get_single_supplier_inventory.__doc__ = f"""
 
 Returns a specific supplier detail and the product they supply for a business
 
-The value of `business_name` parameter must be formatted in the following way:
-
 Args:
-    business_name : The name of the business to filter result
+    business_id : The id of the business to filter result
 
 
 Returns:
     (supplier_name, supplier_contact_details,product_id, item_name, brand, cost_price, availability)"""
-
-
-print(delete_supplier_inv("numina_analytics","tech@technovasupplies.com",["wireless_mouse"],[["TechGear"]]))

@@ -4,9 +4,8 @@ import datetime
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from database_manager.supply_manager.tools import *
 
-def get_supplier_id_by_name(business_name:int,
+def get_supplier_id_by_name(business_id:str,
                 name: str) -> int:
-    business_id = get_single_value("business", "business_name", business_name, "id")
     cursor.execute("""SELECT id,name, contact_details from supplier WHERE business_id=%s AND name=%s""",(business_id,name))
     supplier_id = cursor.fetchall()
     cursor.reset()
@@ -21,17 +20,16 @@ def get_supplier_id_by_name(business_name:int,
 def add_supply_order(
     item_name : str,
     item_brand : str,
-    business_name : str,
+    business_id : str,
     supplier_contact_det : str,
     quantity : int,
     supplier_id : int = -1,
 ) -> str:
     
-    business_id = get_single_value("business", "business_name", business_name, "id")
     product_id = get_product_id(business_id,item_name,item_brand)
     if product_id == -1:
         return "Product Not Found"
-    supplier_id = get_supplier_id_by_mail(business_name,supplier_contact_det) 
+    supplier_id = get_supplier_id_by_mail(business_id,supplier_contact_det) 
     if isinstance(supplier_id,int):
         if supplier_id == -1:
             return "Supplier does not exist"
@@ -49,7 +47,7 @@ def add_supply_order(
             return """Item not available in Supplier stock"""
         
         time_of_order = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        columns = "(product_id, business_id, supplier_id, quantity_ordered, date_ordered, fulfilled)"
+        columns = "(product_id, business_id, supplier_id, quantity_ordered, date_ordered, order_status)"
         vals = (product_id,business_id,supplier_id,quantity,time_of_order,0)
         vals_fmt = ", ".join(["%s" for _ in range(len(vals))])
         return insert("supply_order", columns, vals, vals_fmt)
@@ -57,10 +55,9 @@ def add_supply_order(
         return f"Multiple Suppliers Found {supplier_id}"
     
 def get_unfulfilled_supplier_order(
-        business_name: str,
+        business_id: str,
     ) -> str:
     
-    business_id = get_single_value("business", "business_name", business_name, "id")
     cursor.execute("""SELECT 
         so.id AS order_id,
         b.business_name,
@@ -72,12 +69,12 @@ def get_unfulfilled_supplier_order(
     JOIN business b ON so.business_id = %s
     JOIN product p ON so.product_id = p.id
     JOIN supplier s ON so.supplier_id = s.id
-    WHERE so.order_status = fulfilled;
-    """, (business_id,))
+    WHERE so.order_status=%s;
+    """, (business_id,"pending"))
     return f"""{cursor.fetchall()}"""
 
 def get_unfulfilled_customer_orders(
-        business_name: str,
+        business_id: str,
     ) -> str:
     
     query = """
@@ -95,22 +92,17 @@ def get_unfulfilled_customer_orders(
     FROM customer_order co
     JOIN customer c ON co.customer_id = c.id
     JOIN product p ON co.product_id = p.id
-    WHERE co.business_id = %s
-      AND co.order_status != 'fulfilled';
+    WHERE co.business_id=%s
+      AND co.order_status=%s;
     """
-    business_id = get_single_value("business", "business_name", business_name, "id")
-    cursor.execute(query, (business_id,))
+    cursor.execute(query, (business_id,"pending"))
     return f"""{cursor.fetchall()}"""
 
 
 get_supplier_id_by_name.__doc__ = f"""
     Returns supplier id
-
-    The value of the `business_name` and `name` parameter must be formatted in the following way:
-        {params_format()}
-
     Args:
-        business_name (int): name of the business
+        business_id (int): ID of the business
         name(str): Name of the supplier
         
     Returns:
@@ -119,13 +111,13 @@ get_supplier_id_by_name.__doc__ = f"""
 
 add_supply_order.__doc__ = f"""
     Add an order to supply_order
-    The value of `item_name`, `item_brand`, `business_name`, `supplier_name` class parameters must be formatted in the following way:
+    The value of `item_name`, `item_brand`, `supplier_name` class parameters must be formatted in the following way:
         {params_format()}
 
     Args:
         item_name(str) : Name of the item
         item_brand(str) : brand of the item
-        business_name(str) : Name of the item
+        business_id(str) : id of the business
         supplier_name(str) : Name of the Supplier
         quantity(int) : Quantity of items to be supplied
         supplier_id(int) : ID of the supplier, use only if you have the ID
@@ -135,10 +127,8 @@ add_supply_order.__doc__ = f"""
 get_unfulfilled_supplier_order.__doc__ = f"""
     Returns unfulfilled supplier orders
     
-    The value of the business_name must be formatted in the following way:
-        {params_format}
     Args:
-    business_name[str] : Name of the business
+    business_id[str] : ID of the business
 
     
     Returns:
@@ -148,11 +138,8 @@ get_unfulfilled_supplier_order.__doc__ = f"""
 get_unfulfilled_customer_orders.__doc__ = f"""
     Returns unfulfilled customer orders
     
-    The value of the business_name must be formatted in the following way:
-        {params_format}
-
     Args:
-    business_name[str] : Name of the business
+    business_id[str] : ID of the business
 
     Returns:
         Unfulfilled Customer Orders
