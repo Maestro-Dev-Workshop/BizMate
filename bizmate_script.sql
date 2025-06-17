@@ -22,6 +22,7 @@ CREATE TABLE product (
     item_name VARCHAR(255),
     category VARCHAR(255),
     brand VARCHAR(255),
+    `active` BOOLEAN,
     minimum_threshold INTEGER,
     quantity_in_stock INTEGER,
     selling_price DECIMAL,
@@ -56,18 +57,11 @@ CREATE TABLE customer_order (
     FOREIGN KEY (business_id) REFERENCES business(id)
 );
 
- -- Table: customer_preferences
- CREATE TABLE customer_preference (
-	id INTEGER AUTO_INCREMENT PRIMARY KEY,
-    customer_id INTEGER NOT NULL,
-    preference VARCHAR(255),
-    FOREIGN KEY(customer_id) REFERENCES customer(id)
- );
-
 -- Table: suppliers
 CREATE TABLE supplier (
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     business_id INTEGER NOT NULL,
+    `active` BOOLEAN,
     name VARCHAR(255),
     contact_details VARCHAR(255),
     FOREIGN KEY (business_id) REFERENCES business(id)
@@ -80,7 +74,7 @@ CREATE TABLE supply_order (
     business_id INTEGER NOT NULL,
     supplier_id INTEGER NOT NULL,
     quantity_ordered INTEGER,
-    fulfilled BOOLEAN,
+    order_status BOOLEAN,
     date_ordered TIMESTAMP,
     FOREIGN KEY (product_id) REFERENCES product(id),
     FOREIGN KEY (business_id) REFERENCES business(id),
@@ -93,6 +87,7 @@ CREATE TABLE supplier_inventory (
     supplier_id INTEGER NOT NULL,
     cost_price DECIMAL,
     available BOOLEAN,
+    `active` BOOLEAN,
     PRIMARY KEY (product_id, supplier_id),
     FOREIGN KEY (product_id) REFERENCES product(id),
     FOREIGN KEY (supplier_id) REFERENCES supplier(id)

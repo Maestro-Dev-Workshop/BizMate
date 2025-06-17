@@ -55,7 +55,7 @@ supply_agent = Agent(
     If an item was provided, delete only the item and nothing else, do not delete the supplier
     ### Deleting Supplier
         To delete a supplier:
-            - Require the name or contact details, 
+            - Require either name or contact details, 
             - If name was provided use get_rows_with_exact_column_values to get the value of the contact details column
             - Based on the get all the items the supplier has using get_single_supplier_inventory
             - Then call delete_supplier_and_supplier_inv
@@ -65,7 +65,7 @@ supply_agent = Agent(
             - require the item name, brand, and supplier name/contact details
             - If only the supplier name is provided, retrieve their contact_details
             - delete using delete_supplier_inv.
-        
+
 
     ## View
     - You can view supplier you have using view_suppliers

@@ -47,6 +47,7 @@ root_agent = Agent(
             - Be very specific on what you want the tool to perform. For example user wants to delete supplier name X:
                 request: "business_name: numina_analytics, business_id: 2, action: delete, supplier_name: Aquasource Nigeria ltd"
                 Better request: request: "business_name: numina_analytics, business_id: 2, action: delete supplier , supplier_name: Aquasource Nigeria ltd"
+            - Do not feed your tools false information, if you don't have an information, don't make it up
 
 
 

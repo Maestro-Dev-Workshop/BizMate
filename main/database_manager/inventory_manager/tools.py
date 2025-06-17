@@ -19,32 +19,32 @@ def add_item(
     business_id = get_single_value("business", "business_name", business_name, "id")
     expiry_dates = [[datetime.datetime.strptime(exp, "%Y-%m-%d").date() for exp in sublist] for sublist in expiry_dates]
     cols = (brands, quantities, min_thresholds, sps, min_selling_prices, expiry_dates, metadata)
-    columns = "(business_id, item_name, category, brand, quantity_in_stock, minimum_threshold, selling_price, minimum_selling_price, expiry_date, metadata)"
-    fmt = "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s"
+    columns = "(business_id, item_name, category, brand, quantity_in_stock, minimum_threshold, selling_price, minimum_selling_price, expiry_date, metadata, active)"
+    fmt = "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s"
     message = {}
     for ind in range(len(item_names)):
         for sub_ind in range(len(brands[ind])):
-            row = [business_id, item_names[ind], categories[ind]] + [col[ind][sub_ind] for col in cols]
+            row = [business_id, item_names[ind], categories[ind]] + [col[ind][sub_ind] for col in cols] + [1]
             message[f"{item_names[ind]}, brand: {brands[ind][sub_ind]}"] = insert("product", columns, row, fmt)
     return message
 
 
 def get_expired_goods(business_name: str):
     business_id = get_single_value("business", "business_name", business_name, "id")
-    query = "SELECT * FROM product WHERE expiry_date < CURDATE() AND business_id= %s"
+    query = "SELECT * FROM product WHERE expiry_date < CURDATE() AND business_id= %s AND active=1"
     cursor.execute(query,(business_id,))
     return f"Expired Goods : {cursor.fetchall()}"
 
 def get_minimum_threshold(business_name: str):
     """Returns Items below minimum threshold"""
     business_id = get_single_value("business", "business_name", business_name, "id")
-    query = "SELECT * FROM product WHERE quantity_in_stock <= minimum_threshold AND business_id= %s"
+    query = "SELECT * FROM product WHERE quantity_in_stock <= minimum_threshold AND business_id= %s AND active=1"
     cursor.execute(query, (business_id,))
     return f"Items below minimum threshold: {cursor.fetchall()}"
 
 def view_items(business_name: str):
     business_id = get_single_value("business", "business_name", business_name, "id")
-    query = "SELECT * FROM product WHERE business_id= %s"
+    query = "SELECT * FROM product WHERE business_id= %s AND active=1"
     cursor.execute(query, (business_id,))
     return f"Items are: {cursor.fetchall()}"
 
