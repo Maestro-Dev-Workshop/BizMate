@@ -52,18 +52,20 @@ inventory_agent = Agent(
 
     ## Inventory Report ##
         Before generating a report, check if inventory has any items. If empty, inform the agent to add items before a report can be generated.
-        If items exist, provide a clear, structured report covering:
+        If items exist, provide a clear, structured report covering only the following listed below:
             - Items below their minimum quantity threshold
             - Items that have expired using get_expired_goods()
 
+        Do not report on the items the user has
         Ensure the report is easy to understand and do not prompt the agent for further choices.
 
     ## Notes ##
-        - Use get_rows_with_exact_column_values to list inventory items. Do not ask the agent to specify columns; return all columns.
+        - Use view_items to list inventory items..
         - When inserting multiple rows, combine all rows into a single function call.
     """,
     tools=[
         get_rows_with_exact_column_values,
+        view_items,
         update_table,
         delete_row,
         add_item,

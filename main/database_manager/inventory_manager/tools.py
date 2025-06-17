@@ -42,6 +42,23 @@ def get_minimum_threshold(business_name: str):
     cursor.execute(query, (business_id,))
     return f"Items below minimum threshold: {cursor.fetchall()}"
 
+def view_items(business_name: str):
+    business_id = get_single_value("business", "business_name", business_name, "id")
+    query = "SELECT * FROM product WHERE business_id= %s"
+    cursor.execute(query, (business_id,))
+    return f"Items are: {cursor.fetchall()}"
+
+view_items.__doc__ = f"""
+Returns all the item for a business
+The value of `business_name` parameter must be formatted in the following way:
+{params_format()}
+Args:
+    business_name(str) : Name of the business
+
+Returns:
+    the items available
+
+"""
 
 get_expired_goods.__doc__ = f"""Returns Expired Goods
 business_name must be formatted as {params_format}
