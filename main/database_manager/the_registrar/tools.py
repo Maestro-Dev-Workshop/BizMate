@@ -40,8 +40,8 @@ Returns:
 """
 
 
-def delete_business(business_name : str) ->str:
-    return update_table("business",["business_name"],[business_name],["active"],[False])
+def delete_business(business_id : str) ->str:
+    return update_table("business",["id"],[business_id],["active"],[False])
 
 def verify_business(business_name: str) -> str:
     ids = get_rows_with_exact_column_values("business", "business_name", business_name, "id"),
@@ -53,10 +53,8 @@ def verify_business(business_name: str) -> str:
     return "Does Not Exist"
 
 delete_business.__doc__ = f"""Updates active column to false
-    The values of the `business_name` must be formatted in the following way:
-     {params_format()}
     Args:
-        business_name(str): Name of the business
+        business_id(str): ID of the business
     
     Returns
         whether the update operation was successful or not
