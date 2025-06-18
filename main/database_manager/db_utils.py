@@ -1,37 +1,43 @@
 import mysql.connector
 from dotenv import load_dotenv
 import os
+from googleapiclient import discovery
+from google.auth import default
 load_dotenv()
-# hosted
+
+def get_instance_external_ip(project_id, zone, instance_name):
+    credentials, _ = default()
+    service = discovery.build('compute', 'v1', credentials=credentials)
+
+    request = service.instances().get(project=project_id, zone=zone, instance=instance_name)
+    response = request.execute()
+
+    # Extract external IP
+    interfaces = response['networkInterfaces']
+    access_configs = interfaces[0].get('accessConfigs', [])
+    
+    if access_configs:
+        return access_configs[0].get('natIP')
+    else:
+        return None
+
+PROJECT_ID=os.environ["PROJECT_ID"]
+ZONE=os.environ["ZONE"]
+INSTANCE=os.environ["INSTANCE"]
+USER = os.environ["USER"]
+PASSWORD = os.environ["PASSWORD"]
+
+IP = get_instance_external_ip(PROJECT_ID, ZONE, INSTANCE)
+
 hosted = {
-    "host":"34.57.91.175",
-    "user":"dbuser",
-    "password":"Root@1234",
+    "host":IP,
+    "user":USER,
+    "password":PASSWORD,
     "database":"bizdb"
 }
 
-# Local
-local = {
-    "host":"localhost",
-    "user":"root",
-    "password":"root",
-    "database":"bizdb"
-}
-
-env = os.environ["SQL_HOST"]
-if env == "hosted":
-    db = mysql.connector.connect(**hosted)
-else:
-    db = mysql.connector.connect(**local)
-cursor =db.cursor()
-# cursor = db.cursor()
-# cursor.execute("SHOW DATABASES")
-
-
-# CREATE USER 'dbuser'@'102.88.114.17' IDENTIFIED BY 'Root@1234';
-# GRANT ALL PRIVILEGES ON *.* TO 'dbuser'@'102.88.114.17';
+db = mysql.connector.connect(**hosted)
+cursor = db.cursor()
+# CREATE USER 'dbuser'@'%' IDENTIFIED BY 'bizMate@v0';
+# GRANT ALL PRIVILEGES ON *.* TO 'dbuser'@'%';
 # FLUSH PRIVILEGES;
-# Issues
-# 1. Trigger to start and stop the compute instance
-# 2. IP address of the compute instance changes
-# 3. Local IP address also changes
