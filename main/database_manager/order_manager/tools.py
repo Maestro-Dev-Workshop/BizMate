@@ -23,7 +23,6 @@ def add_supply_order(
     business_id : str,
     supplier_contact_det : str,
     quantity : int,
-    supplier_id : int = -1,
 ) -> str:
     
     product_id = get_product_id(business_id,item_name,item_brand)
@@ -46,9 +45,9 @@ def add_supply_order(
         if len(output) == 1:
             return """Item not available in Supplier stock"""
         
-        time_of_order = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        time_of_order = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         columns = "(product_id, business_id, supplier_id, quantity_ordered, date_ordered, order_status)"
-        vals = (product_id,business_id,supplier_id,quantity,time_of_order,0)
+        vals = (product_id,business_id,supplier_id,quantity,time_of_order,"pending")
         vals_fmt = ", ".join(["%s" for _ in range(len(vals))])
         return insert("supply_order", columns, vals, vals_fmt)
     else:
@@ -60,18 +59,18 @@ def get_unfulfilled_supplier_order(
     
     cursor.execute("""SELECT 
         so.id AS order_id,
-        b.business_name,
         p.item_name,
         s.name AS supplier_name,
         so.quantity_ordered,
         so.date_ordered
     FROM supply_order so
-    JOIN business b ON so.business_id = %s
     JOIN product p ON so.product_id = p.id
     JOIN supplier s ON so.supplier_id = s.id
-    WHERE so.order_status=%s;
+    WHERE so.business_id=%s AND so.order_status=%s;
     """, (business_id,"pending"))
-    return f"""{cursor.fetchall()}"""
+
+    results = cursor.fetchall()
+    return f"""{results}"""
 
 def get_unfulfilled_customer_orders(
         business_id: str,
@@ -144,3 +143,9 @@ get_unfulfilled_customer_orders.__doc__ = f"""
     Returns:
         Unfulfilled Customer Orders
     """
+
+# Item Name: Protein Shake (Vanilla, 500ml)
+# Item Brand: NutriCrave
+# Quantity: 120
+# Supplier Name: NutriWell Distributors
+# print(get_unfulfilled_supplier_order("2"))

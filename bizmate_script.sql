@@ -74,7 +74,7 @@ CREATE TABLE supply_order (
     business_id INTEGER NOT NULL,
     supplier_id INTEGER NOT NULL,
     quantity_ordered INTEGER,
-    order_status BOOLEAN,
+    order_status VARCHAR(255),
     date_ordered TIMESTAMP,
     FOREIGN KEY (product_id) REFERENCES product(id),
     FOREIGN KEY (business_id) REFERENCES business(id),
