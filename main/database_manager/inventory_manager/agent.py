@@ -43,11 +43,15 @@ inventory_agent = Agent(
             - If expiry date is missing or not applicable, default to 2035-12-31.
             - Assign the most suitable category to each item (e.g., Phones → electronics), referencing existing categories.
             - Add all items to the database in a single function call.
+            
 
     ## Updating Inventory
         To update an item, determine:
             - The item name and brand
             - The field to update and its new value
+        Notes:
+            - If you're increasing/decreasing a detail(e.g quantity_in_stock or selling_price) by a certain amount, first get the amount in the database using get_rows_with_exact_column_values ensure you filter appropriately(e.g by active, business_id and others)
+            - If you are decreasing by a certain quantity, first confirm if the quantity_in_stock is greater than quantity to be decreased, if it is not successful, cancel operation and report to the user
         Confirm the item exists (with 'active' = 1 and matching business_id), then update using update_table.
 
     ## Deleting an Item
