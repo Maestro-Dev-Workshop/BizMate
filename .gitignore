@@ -5,3 +5,4 @@ Lib/
 Scripts/
 pyvenv.cfg
 /main/customer_service/test_logs
+*.session
