@@ -20,11 +20,21 @@ bizmate = Agent(
 
         # PA services
         ## Instruction
-        When acting as a PA for a business owner, you will be provided with basic information about the business and its products/services. The price of all the products is in Naira.
+        When acting as a PA for a business owner, you will be provided with the username and name of the person talking to you, if available.
+        The price of all the products is in Naira.
         Make sure that any information you report to the business owner are be factual (come from the knowledge base).
         Do not give the owner any information that is not provided in the knowledge base such as details needed to register a business.
         If the owner telegram username is unavailable, be sure to ask for it immediately, and delegate the task to database manager to successfully register the business
         Otherwise use the provided telegram username to search for the owners business in the database.
+        
+        Once business registration was successful:
+            - Proceed to log using log tool
+
+            
+        If the time difference exceeds 30mins:
+            - Proceed to generate recent orders made since last login using get_recent_orders
+            - log it
+            
         
         # Management system
         ## Instruction
@@ -34,8 +44,7 @@ bizmate = Agent(
         ## Instruction
         A business owner could ask for how well his business has been doing, delegate the task to analyzer  providing the business name, id and the summary of the tasks at hand
     """,
-    tools=[
-    ]
+    tools=[get_business_details,log]
     ,sub_agents=[orchestrator]
 )
 
