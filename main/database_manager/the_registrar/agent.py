@@ -1,7 +1,7 @@
 from google.adk.agents import Agent
 from google.adk.tools import agent_tool
 import asyncio
-from botmama.agent import bot_mama
+from .botmama.agent import bot_mama
 from .tools import *
 from google.adk.sessions import InMemorySessionService
 from google.adk.runners import Runner
@@ -44,7 +44,7 @@ the_registrar = Agent(
         - Create Customer Agent Bot for the business using bot_mama, feed the tool with the Business Name
         - Add the business to the database.
     
-    If successful, return the following, **business_name** has been successful, you customers can buy your products using **bot_link**
+    If successful, return the following, **business_name**(**business_id**) has been successful, you customers can buy your products using **bot_link**
 
     ### Deleting a Business ###
     Obtain the business name, verify its existence, then use the delete_business tool.
@@ -54,81 +54,3 @@ the_registrar = Agent(
     """,
     tools=[add_business, verify_business, delete_business, update_table, agent_tool.AgentTool(bot_mama)]
 )
-
-
-
-async def create_session(app_name, user_id, session_id, session_service):
-    session = await session_service.create_session(
-        app_name=app_name,
-        user_id=user_id,
-        session_id=session_id,
-    )
-    print(f"Session created: APP_NAME={app_name}, USER_ID={user_id}, SESSION_ID={session_id}")
-
-    return session
-
-async def get_session(app_name, user_id, session_id, session_service):
-    session = await session_service.get_session(
-        app_name=app_name,
-        user_id=user_id,
-        session_id=session_id
-    )
-
-    return session
-
-def create_runner(app_name, session_service):
-    runner = Runner(
-        agent=bot_mama,
-        app_name=app_name,
-        session_service=session_service
-    )
-
-    return runner
-
-async def call_agent_async(query: str, runner, user_id, session_id):
-    # print(f"\n>>> User Query: {query}")
-
-    content = types.Content(role='user', parts=[types.Part(text=query)])
-    final_response_text = "Agent did not produce a final response."
-
-    async for event in runner.run_async(user_id=user_id, session_id=session_id, new_message=content):
-        # print(f"  [Event] Author: {event.author}, Type: {type(event).__name__}, Final: {event.is_final_response()}, Content: {event.content}")
-
-        if event.is_final_response():
-            if event.content and event.content.parts:
-                final_response_text = event.content.parts[0].text
-            elif event.actions and event.actions.escalate:
-                final_response_text = f"Agent escalated: {event.error_message or 'No specific message.'}"
-            break
-
-    return final_response_text
-
-async def main():
-    APP_NAME = "bizmate_test_app"
-    USER_ID = "user_1"
-    SESSION_ID = "session_001"
-
-    session_service = InMemorySessionService()
-    session = await create_session(APP_NAME, USER_ID, SESSION_ID, session_service)
-    runner = create_runner(APP_NAME, session_service)
-
-    async def run_conversation():
-        initial_prompt = f"""
-            Hi
-        """
-        initial_response = await call_agent_async(initial_prompt, runner, USER_ID, SESSION_ID)
-        print(f">>> Agent: {initial_response}")
-
-        running = True
-        while running:
-            user_query = input(">>> User: ")
-            if user_query == "q":
-                running = False
-            else:
-                response = await call_agent_async(user_query, runner, USER_ID, SESSION_ID)
-                print(f">>> Agent: {response}")
-    
-    await run_conversation()
-
-if __name__ == "__main__":
-    asyncio.run(main())

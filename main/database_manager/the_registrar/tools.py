@@ -6,6 +6,7 @@ import datetime
 
 
 def add_business(
+        username : str,
         name : str,
         business_name : str,
         brief_description : str,
@@ -16,8 +17,8 @@ def add_business(
         bot_link: str) -> str:
     dob = datetime.datetime.strptime(dob,"%Y-%m-%d").date()
     date_joined = datetime.date.today()
-    values = (name, business_name, brief_description, date_joined, contact_details,physical_address,dob,True,bot_username, bot_link)
-    fmt = "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s"
+    values = (username, name, business_name, brief_description, date_joined, contact_details,physical_address,dob,True,bot_username, bot_link)
+    fmt = "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s"
     columns = "(username, business_name, brief_description, date_joined, contact_details, physical_address, date_of_birth, active, bot_username, bot_link)"
     return insert("business", columns, values, fmt)
 
@@ -28,6 +29,7 @@ The values of `name` and `business_name` must be formatted as follows:
 {params_format()}
 
 Args:
+    Username (str) : Username of the business admin
     name (str): Name of the business owner.
     business_name (str): Name of the business.
     brief_description (str): Brief description of the business.

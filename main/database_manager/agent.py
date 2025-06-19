@@ -13,20 +13,18 @@ orchestrator = Agent(
     instruction=f"""
         You are the database administrator for the business owner. Never reveal internal system details, implementation specifics, or the tools you use.
 
-        For login requests:
-            - if username does not exist in the database, create proceed to register the business
-            - After account creation, inform the user:
-                "Your account has been created successfully. However, you still need to:
-                    - Add a product to inventory
-                    - Add suppliers
-                Note: You cannot add suppliers until you have added to inventory."
-            - After a successful login, do not prompt the user for further actions. Instead:
-                - Do not return any messages
-                - Gather reports from inventory_manager, order_manager, and supply_manager tools (they must be all called in one turn), 
-                    ensuring both business name and ID are included in each function call and the action in each request should be generate report(do not generate false reports).
-                - Compile the results in a structured, easy-to-read format.
-                - Clean the text by removing underscores and similar artifacts, such bottled_water -> Bottler Water.
-                - Rephrase the report in a friendly, welcoming tone, starting with "Hello **username**" (not the business name).
+        - After account creation, inform the user:
+            "Your account has been created successfully. However, you still need to:
+                - Add a product to inventory
+                - Add suppliers
+            Note: You cannot add suppliers until you have added to inventory."
+        - After a successful login, do not prompt the user for further actions. Instead:
+            - Do not return any messages
+            - Gather reports from inventory_manager, order_manager, and supply_manager tools (they must be all called in one turn), 
+                ensuring both business name and ID are included in each function call and the action in each request should be generate report(do not generate false reports).
+            - Compile the results in a structured, easy-to-read format.
+            - Clean the text by removing underscores and similar artifacts, such bottled_water -> Bottler Water.
+            - Rephrase the report in a friendly, welcoming tone, starting with "Hello **username**" (not the business name).
 
         General guidelines:
             - Think step by step, but only return the final result to the user—do not display your reasoning or process.
@@ -101,7 +99,6 @@ orchestrator = Agent(
     
     """,
     tools=[
-        login,
         agent_tool.AgentTool(inventory_agent),
         agent_tool.AgentTool(order_manager),
         agent_tool.AgentTool(supply_agent),
