@@ -1,7 +1,9 @@
 import mysql.connector
 from dotenv import load_dotenv
 import os
+from pathlib import Path
 load_dotenv()
+
 # hosted
 hosted = {
     "host":"34.57.91.175",
@@ -18,11 +20,7 @@ local = {
     "database":"bizdb"
 }
 
-env = os.environ["SQL_HOST"]
-if env == "hosted":
-    db = mysql.connector.connect(**hosted)
-else:
-    db = mysql.connector.connect(**local)
+db = mysql.connector.connect(**local)
 cursor =db.cursor()
 # cursor = db.cursor()
 # cursor.execute("SHOW DATABASES")

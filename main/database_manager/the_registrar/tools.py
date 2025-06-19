@@ -12,12 +12,13 @@ def add_business(
         contact_details : str,
         physical_address: str,
         dob:str,
-        password:str) -> str:
+        bot_username: str,
+        bot_link: str) -> str:
     dob = datetime.datetime.strptime(dob,"%Y-%m-%d").date()
     date_joined = datetime.date.today()
-    values = (name, business_name, brief_description, date_joined, contact_details,physical_address,dob,password,True)
-    fmt = "%s, %s, %s, %s, %s, %s, %s, %s, %s"
-    columns = "(username, business_name, brief_description, date_joined, contact_details, physical_address, date_of_birth, password, active)"
+    values = (name, business_name, brief_description, date_joined, contact_details,physical_address,dob,True,bot_username, bot_link)
+    fmt = "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s"
+    columns = "(username, business_name, brief_description, date_joined, contact_details, physical_address, date_of_birth, active, bot_username, bot_link)"
     return insert("business", columns, values, fmt)
 
 add_business.__doc__ = f"""
@@ -33,7 +34,8 @@ Args:
     contact_details (str): Email or phone number of the business.
     physical_address (str): The physical location of the business.
     dob (str): Date of birth in YYYY-MM-DD format.
-    password (str): Login password.
+    bot_username (str): Bot Username
+    bot_link (str): Bot link
 
 Returns:
     str: Message indicating if the insertion was successful.

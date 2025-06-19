@@ -1,60 +1,43 @@
-from google.adk.agents import Agent
-from google.adk.tools import agent_tool
 import asyncio
-from botmama.agent import bot_mama
-from .tools import *
+from main.database_manager.agent import orchestrator
+from google.adk.agents import Agent
 from google.adk.sessions import InMemorySessionService
 from google.adk.runners import Runner
 from google.genai import types
+from tools import *
 
-
-the_registrar = Agent(
-    name="the_registrar",
+bizmate = Agent(
+    name="bizmate",
     model="gemini-2.0-flash",
-    description="Agent responsible for registering business basic information into the database.",
-    instruction=f"""
-    You are the business registrar. When executing a task, do not ask for user permission; simply follow the instructions and return only the final result (do not explain your thought process). Your tasks include:
-    - Registering a user's business basic information in the database.
-    - Deleting a business from the database.
-    - Verifying a business in the database.
+    description=("Agent that manages interact with Small to Medium enterprise(SME) Business Owners"),
+    instruction="""
+        You are a BizMate. Your job is to help SME owners in managing inventory, suppliers, suppliers inventory, customer order and supply order.
 
-    Table business description:
-    {describe_table("business")}
+        Your primary functions include:
+        1. Acting as a Personal Assistant(PA) for the business owner
+        2. Answering questions about a business and its products/services
+        3. Delegating tasks to subagent
 
-    An account having active=0 means it has been deleted, so make sure you work with active account by filtering it
+        # PA services
+        ## Instruction
+        When acting as a PA for a business owner, you will be provided with basic information about the business and its products/services. The price of all the products is in Naira.
+        Make sure that any information you report to the business owner are be factual (come from the knowledge base).
+        Do not give the owner any information that is not provided in the knowledge base such as details needed to register a business.
+        If the owner telegram username is unavailable, be sure to ask for it immediately, and delegate the task to database manager to successfully register the business
+        Otherwise use the provided telegram username to search for the owners business in the database.
+        
+        # Management system
+        ## Instruction
+        When the owner requests for a management service, such as, adding items to inventory, updating supplier information, or fulfilling an order, delegate such tasks to the db_orchestrator providing the business name, id and the summary of the tasks at hand
 
-    ### Registering a Business ###
-    Collect the following information, asking for all at once and in this order:
-
-        1. User name
-        2  Name
-        3. Business name
-        4. Brief description of the business
-        5. User's contact details (email only)
-        6. User's physical address
-        7. User's date of birth (YYYY-MM-DD) to confirm age above 18
-    
-
-    If you receive a context with business information, extract the above details. If any are missing, inform the user which details are needed.
-
-    While collecting information:
-        - Ensure the business name does not already exist in the database using the verify_business tool. If it exists, notify the user and prompt for a different business name.
-
-    After gathering all required information and they are all verified:
-        - Create Customer Agent Bot for the business using bot_mama, feed the tool with the Business Name
-        - Add the business to the database.
-    
-    If successful, return the following, **business_name** has been successful, you customers can buy your products using **bot_link**
-
-    ### Deleting a Business ###
-    Obtain the business name, verify its existence, then use the delete_business tool.
-
-    ### Updating a Business ###
-    Obtain the business name, verify its existence, collect the detail to update and value, then use the update_table tool, ensure you filter by active.
+        # Analytics services
+        ## Instruction
+        A business owner could ask for how well his business has been doing, delegate the task to analyzer  providing the business name, id and the summary of the tasks at hand
     """,
-    tools=[add_business, verify_business, delete_business, update_table, agent_tool.AgentTool(bot_mama)]
+    tools=[
+    ]
+    ,sub_agents=[orchestrator]
 )
-
 
 
 async def create_session(app_name, user_id, session_id, session_service):
@@ -78,7 +61,7 @@ async def get_session(app_name, user_id, session_id, session_service):
 
 def create_runner(app_name, session_service):
     runner = Runner(
-        agent=bot_mama,
+        agent=bizmate,
         app_name=app_name,
         session_service=session_service
     )
@@ -113,8 +96,14 @@ async def main():
     runner = create_runner(APP_NAME, session_service)
 
     async def run_conversation():
+        business_id = "1"
+        customer_username = "blaze"
         initial_prompt = f"""
-            Hi
+            This is a message from the business admin.
+            The id of the business in the database is {business_id}. Use your tools to extract basic information about the business and its products.
+            Ensure to greet the customer and provide a very brief description of the business, including the name and services offered.
+            The telegram username of the customer you're currently serving is {customer_username}. Confirm if the customer already exists in the database before interacting.
+            From now on you will be engaging with the customer.
         """
         initial_response = await call_agent_async(initial_prompt, runner, USER_ID, SESSION_ID)
         print(f">>> Agent: {initial_response}")

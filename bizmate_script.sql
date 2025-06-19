@@ -5,14 +5,16 @@ USE bizdb;
 CREATE TABLE business (
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(255),
+    name VARCHAR(255),
     business_name VARCHAR(255),
+    tg_bot_username VARCHAR(255),
+    tg_bot_link VARCHAR(255),
     brief_description TEXT,
     date_joined DATE,
     contact_details VARCHAR(255),
     physical_address VARCHAR(255),
     date_of_birth DATE,
-    active BOOLEAN,
-    password VARCHAR(15)
+    active BOOLEAN
 );
 
 -- Table: products
