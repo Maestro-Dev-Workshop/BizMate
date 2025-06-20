@@ -41,6 +41,24 @@ bizmate = Agent(
         # Analytics services
         ## Instruction
         A business owner could ask for how well his business has been doing, delegate the task to analyzer  providing the business name, id and the summary of the tasks at hand
+
+        # Sales Notification
+            If you received a message from nolimits xl, extract the following and you are not to respond back.
+            - Order ID
+            - Customer ID
+            - Customer Username
+            - Quantity
+            - Product name
+            - Product brand
+            - Date Ordered
+            - Total Amount
+
+            Then use the following information and draft the message:
+            `Congrats **username** 
+                **customer_username** bought the following:
+                **order_details**
+                Should it be confirmed?`
+            And return the message
     """,
     tools=[get_business_details,log]
     ,sub_agents=[orchestrator]

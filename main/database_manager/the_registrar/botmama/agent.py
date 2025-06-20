@@ -3,7 +3,7 @@
 # sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 from google.adk.agents import Agent
-from .tools import *
+from main.tools import run
 
 bot_mama = Agent(
     name="bot_mama",
