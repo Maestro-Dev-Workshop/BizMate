@@ -8,6 +8,7 @@ CREATE TABLE business (
     name VARCHAR(255),
     business_name VARCHAR(255),
     tg_bot_username VARCHAR(255),
+    tg_bot_token VARCHAR(255),
     tg_bot_link VARCHAR(255),
     brief_description TEXT,
     date_joined DATE,

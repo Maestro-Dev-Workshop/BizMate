@@ -1,8 +1,6 @@
 import asyncio
 from google.adk.agents import Agent
-from google.adk.sessions import InMemorySessionService
-from google.adk.runners import Runner
-from google.genai import types
+from main.session_utils import *
 from tools import *
 
 customer_service_agent = Agent(
@@ -56,61 +54,12 @@ customer_service_agent = Agent(
     ]
 )
 
-
-async def create_session(app_name, user_id, session_id, session_service):
-    session = await session_service.create_session(
-        app_name=app_name,
-        user_id=user_id,
-        session_id=session_id,
-    )
-    print(f"Session created: APP_NAME={app_name}, USER_ID={user_id}, SESSION_ID={session_id}")
-
-    return session
-
-async def get_session(app_name, user_id, session_id, session_service):
-    session = await session_service.get_session(
-        app_name=app_name,
-        user_id=user_id,
-        session_id=session_id
-    )
-
-    return session
-
-def create_runner(app_name, session_service):
-    runner = Runner(
-        agent=customer_service_agent,
-        app_name=app_name,
-        session_service=session_service
-    )
-
-    return runner
-
-async def call_agent_async(query: str, runner, user_id, session_id):
-    # print(f"\n>>> User Query: {query}")
-
-    content = types.Content(role='user', parts=[types.Part(text=query)])
-    final_response_text = "Agent did not produce a final response."
-
-    async for event in runner.run_async(user_id=user_id, session_id=session_id, new_message=content):
-        # print(f"  [Event] Author: {event.author}, Type: {type(event).__name__}, Final: {event.is_final_response()}, Content: {event.content}")
-
-        if event.is_final_response():
-            if event.content and event.content.parts:
-                final_response_text = event.content.parts[0].text
-            elif event.actions and event.actions.escalate:
-                final_response_text = f"Agent escalated: {event.error_message or 'No specific message.'}"
-            break
-
-    return final_response_text
-
 async def main():
     APP_NAME = "bizmate_test_app"
     USER_ID = "user_1"
     SESSION_ID = "session_001"
-
-    session_service = InMemorySessionService()
     session = await create_session(APP_NAME, USER_ID, SESSION_ID, session_service)
-    runner = create_runner(APP_NAME, session_service)
+    runner = create_runner(APP_NAME, session_service, customer_service_agent)
 
     async def run_conversation():
         business_id = "1"
