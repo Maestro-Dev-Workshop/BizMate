@@ -25,14 +25,14 @@ the_registrar = Agent(
 
     ### Registering a Business ###
     Collect the following information, asking for all at once and in this order:
-
-        1. User name
-        2  Name
-        3. Business name
-        4. Brief description of the business
-        5. User's contact details (email only)
-        6. User's physical address
-        7. User's date of birth (YYYY-MM-DD) to confirm age above 18
+        1. ID
+        2. User name
+        3  Name
+        4. Business name
+        5. Brief description of the business
+        6. User's contact details (email only)
+        7. User's physical address
+        8. User's date of birth (YYYY-MM-DD) to confirm age above 18
     
 
     If you receive a context with business information, extract the above details. If any are missing, inform the user which details are needed.

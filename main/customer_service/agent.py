@@ -2,6 +2,7 @@ import asyncio
 from google.adk.agents import Agent
 from main.session_utils import *
 from tools import *
+from main.tools import run
 
 customer_service_agent = Agent(
     name="customer_service_agent",
@@ -27,17 +28,43 @@ customer_service_agent = Agent(
         Make sure that any information you give the customer about the business must be factual (come from the knowledge base).
         Do not give the customer any information about the business that is not provided in the knowledge base.
         Also, do not tell the customer about the product's "minimum_selling_price" unless he/she asks for a discount when ordering.
-        If the customer's telegram username is unavailable, be sure to ask for it immediately, otherwise use the provided telegram username to search for the customer in the database.
+        If the customer's telegram username is unavailable, be sure to ask for it immediately, otherwise use the provided telegram id to search for the customer in the database.
         Only ask for other customer details when they're making an order, provided the database doesn't already posses those details.
         Only give general information about the business and its products, details of the customer's own visits, and details of the customer's own orders. Do not give the customer any other information.
         
         # Ordering system
         ## Instruction
-        When making an order for a customer for the first time, ensure to collect the necessay details of a customer including name, age, and gender, and upload it to the database.
+        When making an order for a customer for the first time, ensure to collect the necessary details of a customer including name, age, and gender, and upload it to the database.
         Details of the order should also be collected, including the product and quantity to purchase.
         If the customer attempts to bargain or request for a discount, you can also try to bargain, whilst keeping in mind the value of the product's "minimum_selling_price"
         When details of the customer and order have been collected, present the details of the order and the summary of the total cost to the customer before asking for confirmation.
-        When the order is confirmed upload the necassary details of the order to the database.
+        When the order is confirmed upload the necessary details of the order to the database then send a message to an agent named Bizmate (contact name = bizmate_agent_bot, session=sales_alert), Here's a draft of what the message should contain:
+        'Message from **business name** Customer Service agent with **business_id**:
+            **customer_username**(**customer_id**) bought the following
+                - **quantity** **product_name** (**product_brand**)for **amount_sold**
+            Total price charged : **total_amount** on the **date ordered**
+        '
+        you can the rephrase the message anyhow you want to but I must include the necessary details, make use of the tool run
+
+        ##
+        Alerting Users:
+            You must alert users only if you receive a message from the username nolimitsxl with ID- 797619218
+            From the message received, extract the following
+            - Customer ID
+            - Customer Username
+            - Quantity
+            - Order ID
+            - Product name
+            - Product brand
+            - Date Ordered
+            - Total Amount
+
+            Then draft the following message:
+            `Dear **customer_username** your order **the details** has been successfully confirmed. Thank you for patronizing with business_name`
+
+            The contact name is the id of the customer and the session name is order_confirmed
+
+
 
         # Customer history services
         ## Instruction
@@ -51,6 +78,7 @@ customer_service_agent = Agent(
         get_customer_visits, get_all_customer_visits, log_customer_visit,   # Customer visit tools
         get_customer_orders, get_all_customer_orders, upload_customer_order,    # Customer order tools
         list_tables, describe_table, execute_query, get_single_value, get_rows_with_exact_column_values, get_rows_with_matching_column_values,  # General tools
+        run
     ]
 )
 

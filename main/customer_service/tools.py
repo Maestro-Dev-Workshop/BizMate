@@ -116,7 +116,7 @@ def get_specific_product_info(
 
 
 def get_customer_details(
-        username: str
+        id: str
 ):
     """
     Specialized Customer Service Agent Tool.
@@ -131,8 +131,8 @@ def get_customer_details(
     cols = ["id","username", "name", "age", "gender", "contact_details"]
     result = get_rows_with_exact_column_values(
         "customer", 
-        ["username"], 
-        [username], 
+        ["id"], 
+        [id], 
         cols)
     
     if isinstance(result, str):
@@ -145,6 +145,7 @@ def get_customer_details(
 
 
 def upload_customer_details(
+        id : str,
         username: str,
         name: str,
         age: int,
@@ -156,6 +157,7 @@ def upload_customer_details(
     Uploads details of a customer to the database
 
     Args:
+        id (str): the id of the customer
         username (str): the telegram username of the customer.
         name (str): the name of the customer.
         age (int): the age of the customer.
@@ -165,10 +167,10 @@ def upload_customer_details(
         A response notifying whether or not record upload was successful
     """
     tbl_name = "customer"
-    cols = ["username", "name", "age", "gender", "contact_details"]
+    cols = ["id","username", "name", "age", "gender", "contact_details"]
     cols = f"({', '.join(cols)})"
-    values = (username, name, age, gender, contact_details)
-    values_fmt = "%s, %s, %s, %s, %s"
+    values = (id,username, name, age, gender, contact_details)
+    values_fmt = "%s, %s, %s, %s, %s, %s"
     result = insert(tbl_name, cols, values, values_fmt)
     return result
 
@@ -353,7 +355,6 @@ def upload_customer_order(
     values_fmt = "%s, %s, %s, %s, %s, %s"
     result = insert(tbl_name, cols, values, values_fmt)
     return result
-
 
 if __name__ == "__main__":
     print(get_business_info("1"))

@@ -3,7 +3,7 @@ USE bizdb;
 
 -- Table: businesses
 CREATE TABLE business (
-    id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     username VARCHAR(255),
     name VARCHAR(255),
     business_name VARCHAR(255),
@@ -47,7 +47,7 @@ CREATE TABLE customer (
 
 -- Table: customer_orders
 CREATE TABLE customer_order (
-    id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     customer_id INTEGER NOT NULL,
     product_id INTEGER NOT NULL,
     business_id INTEGER NOT NULL,

@@ -74,6 +74,11 @@ def params_format():
     - For product_name or item_name parameters, do not include any descriptive text, for example granola_bar_(chocolate) -> granola_bar, add the description to the metadata parameter
     """
 
+def get_contact_details(business_id:str):
+    cursor.execute("""SELECT tg_bot_username FROM business WHERE id=%s""",(business_id,))
+    username = cursor.fetchone()
+    cursor.reset()
+    return username
 # Quam oni werey
 def insert(
         tblname :str,
@@ -195,7 +200,6 @@ def login(business_name :str,
     else:
         return detail[0]
 
-
 execute_query.__doc__ = f"""
     General function to execute an SQL statement, returning the results. Can be used to extract useful information.
     
@@ -304,3 +308,14 @@ login.__doc__ = f"""
     Returns: 
     whether the detail exist
     """
+
+get_contact_details.__doc__ = f"""
+Gets the customer service contact details of a business
+
+Args:
+business_id(str) : The id of the business
+
+Returns:
+the customer service details
+
+"""

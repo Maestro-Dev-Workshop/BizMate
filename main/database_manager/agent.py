@@ -4,7 +4,8 @@ from .inventory_manager.agent import inventory_agent
 from .order_manager.agent import order_manager
 from .supply_manager.agent import supply_agent
 from .the_registrar.agent import the_registrar
-from .tools import login,describe_table
+from .tools import get_contact_details
+from main.tools import run
 
 orchestrator = Agent(
     name="Orchestrator",
@@ -63,8 +64,24 @@ orchestrator = Agent(
                 - Special Updating:
                     - If the task involves marking a SUPPLY order as fulfilled, this will involve using two tools inventory_manager and order_manager, ,you will first call order_manager(include order ID) to update the order status to `confirmed` ,
                         then you will call inventory manager to increase the quantity(action=increase quantity in stock) of that item by **the amount**(i.e you're adding to the current quantity),
-                    - If the task involves fulfilling a customer order, this will involve using two tools inventory_manager and order_manager, you will first call inventory_manager to decrease the quantity(action=decrease quantity in stock) of that item by **the amount**(i.e you're subtracting from the quantity), then if inventory manager was successful,
-                        proceed to update the order status to confirmed
+                    - If the task involves fulfilling a customer order, this will involve using multiple tools, for each order:
+                            - you will first call inventory_manager to decrease the quantity(action=decrease quantity in stock) of that item by **the amount**(i.e you're subtracting from the quantity)
+                            - if inventory manager was successful,proceed to update the order status to confirmed.
+                            - After that you'll need to alert the customer service agent, first get the contact name of the bot using get_contact_details
+                            - Draft the following message:
+                                Message from Bizmate,
+                                    The following order:
+                                        Customer Name
+                                        Customer ID
+                                        Product Name
+                                        Product Brand
+                                        Quantity
+                                        Date Ordered
+                                        Price per item
+                                        Total Amount per item (calculate it)
+                                        Overall Amount (calculate it)
+                                Has already been fulfilled/confirmed. You can rephrase the message, as long as it contains all the details
+                        send the message to the right contact name, for each order made, use the tool run
                     Do not ask the user for permission to use tools
                 - If the update doesn't meet the requirement of special update, just call order_manager providing it the necessary details, make sure you state the type of order(customer or supply)
 
@@ -102,6 +119,8 @@ orchestrator = Agent(
         agent_tool.AgentTool(inventory_agent),
         agent_tool.AgentTool(order_manager),
         agent_tool.AgentTool(supply_agent),
-        agent_tool.AgentTool(the_registrar)
+        agent_tool.AgentTool(the_registrar),
+        run,
+        get_contact_details
     ]
 )
