@@ -47,5 +47,28 @@ def get_recent_orders(id):
     cursor.execute("SELECT MAX(login_time) FROM log_history WHERE business_id=%s",(id,))
     last_login = cursor.fetchone()
     last_login = last_login[0]
-    cursor.execute("SELECT * FROM supply_order WHERE business_id=%s and TIMESTAMPDIFF(MINUTE, date_ordered, %s) <= 30", (id,last_login))
+    cursor.execute("SELECT * FROM customer_order WHERE business_id=%s and TIMESTAMPDIFF(MINUTE, date_ordered, %s) <= 30", (id,last_login))
     return cursor.fetchall()
+
+get_business_details.__doc__ = """
+Gets business details
+
+Args:
+username(str): Telegram username
+
+Returns :
+Whether it exists
+"""
+log.__doc__ = """
+Logs Business details
+
+Args:
+id: The business id
+
+Returns
+Whether operation was successful
+
+"""
+get_recent_orders.__doc__ = """
+Get the recent order made 
+"""

@@ -1,9 +1,7 @@
 import asyncio
 from main.database_manager.agent import orchestrator
 from google.adk.agents import Agent
-from google.adk.sessions import InMemorySessionService
-from google.adk.runners import Runner
-from google.genai import types
+from main.session_utils import *
 from tools import *
 
 bizmate = Agent(
@@ -49,33 +47,7 @@ bizmate = Agent(
 )
 
 
-async def create_session(app_name, user_id, session_id, session_service):
-    session = await session_service.create_session(
-        app_name=app_name,
-        user_id=user_id,
-        session_id=session_id,
-    )
-    print(f"Session created: APP_NAME={app_name}, USER_ID={user_id}, SESSION_ID={session_id}")
 
-    return session
-
-async def get_session(app_name, user_id, session_id, session_service):
-    session = await session_service.get_session(
-        app_name=app_name,
-        user_id=user_id,
-        session_id=session_id
-    )
-
-    return session
-
-def create_runner(app_name, session_service):
-    runner = Runner(
-        agent=bizmate,
-        app_name=app_name,
-        session_service=session_service
-    )
-
-    return runner
 
 async def call_agent_async(query: str, runner, user_id, session_id):
     # print(f"\n>>> User Query: {query}")
@@ -100,7 +72,6 @@ async def main():
     USER_ID = "user_1"
     SESSION_ID = "session_001"
 
-    session_service = InMemorySessionService()
     session = await create_session(APP_NAME, USER_ID, SESSION_ID, session_service)
     runner = create_runner(APP_NAME, session_service)
 
