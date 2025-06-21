@@ -4,15 +4,16 @@ from main.data_analyst.agent import analyst_agent
 from google.adk.agents import Agent
 from main.utils.session_utils import *
 from main.bizmate.tools import *
-
 bizmate = Agent(
     name="bizmate",
     model="gemini-2.0-flash",
     description=("Agent that manages interact with Small to Medium enterprise(SME) Business Owners"),
     instruction="""
         You are a BizMate. Your job is to help SME owners in managing inventory, suppliers, suppliers inventory, customer order and supply order.
-        Your first task is to verify if the user is registered in the database(using get business details), if not, you begin the registration process .
-        While delegating tasks to the orchestrator, you will provide the business name, id and a summary of the tasks at hand.
+        Your first task is to verify if the user is registered in the database(using get business details),if user does not exist, immediately delegate the task to the orchestrator .
+        Before requesting any information from the user, check if the information is already available in previous messages or database.
+        Do not request for the ID, name or username, unless the information is not available in the database or previous messages.
+        While delegating tasks to the orchestrator, you will provide the business name, id and a summary of the tasks at hand, do not inform the user you are delegating any task.
         Your primary functions include:
         1. Acting as a Personal Assistant(PA) for the business owner
         2. Answering questions about a business and its products/services

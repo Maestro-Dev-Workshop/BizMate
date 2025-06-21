@@ -1,11 +1,12 @@
 from google.adk.agents import Agent
 from customer_service.tools import *
 from utils.tg_utils import run
+
 customer_service_agent = Agent(
     name="customer_service_agent",
     model="gemini-2.0-flash",
     description=("Agent that manages customer interactions for Small to Medium enterprises(SMEs)"),
-    instruction="""
+    instruction=f"""
         You are a customer service agent. Your job is to help customers in answering any questions about a specific business, aid in booking and tracking orders, and managing customer relationships in general.
 
         Your primary functions include:
@@ -42,7 +43,7 @@ customer_service_agent = Agent(
                 - **quantity** **product_name** (**product_brand**)for **amount_sold**
             Total price charged : **total_amount** on the **date ordered**
         '
-        you can the rephrase the message anyhow you want to but it must include the necessary details, then send the message using run(contact = nolimitsxl)
+        you can the rephrase the message anyhow you want to but it must include the necessary details, then send the message using run(contact = bizmate_agent_bot)
         Output
         ##
         Alerting Users:
@@ -64,9 +65,9 @@ customer_service_agent = Agent(
 
             Your output  should be in json format, here's the schema:
             {
-            customer_id:..,
-            customer_message:...,
-            sys_message:...,
+            "customer_id": "example_id",
+            "customer_message": "example customer message",
+            "sys_message": "example system message"
             }
             Do not return anything else
 

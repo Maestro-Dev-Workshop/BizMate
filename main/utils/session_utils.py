@@ -55,7 +55,8 @@ async def call_agent_async(query: str, runner, user_id, session_id):
     final_response_text = "Agent did not produce a final response."
 
     async for event in runner.run_async(user_id=user_id, session_id=session_id, new_message=content):
-        # print(f"  [Event] Author: {event.author}, Type: {type(event).__name__}, Final: {event.is_final_response()}, Content: {event.content}")
+        print(f"  [Event] Author: {event.author}, Type: {type(event).__name__}, Final: {event.is_final_response()}, Content: {event.content}")
+        print("\n\n")
 
         if event.is_final_response():
             if event.content and event.content.parts:

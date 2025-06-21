@@ -22,7 +22,7 @@ CREATE TABLE business (
 -- Table: products
 CREATE TABLE product (
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
-    business_id INTEGER NOT NULL,
+    business_id VARCHAR(255) NOT NULL,
     item_name VARCHAR(255),
     category VARCHAR(255),
     brand VARCHAR(255),
@@ -49,9 +49,9 @@ CREATE TABLE customer (
 -- Table: customer_orders
 CREATE TABLE customer_order (
     id INTEGER PRIMARY KEY,
-    customer_id INTEGER NOT NULL,
+    customer_id VARCHAR(255) NOT NULL,
     product_id INTEGER NOT NULL,
-    business_id INTEGER NOT NULL,
+    business_id VARCHAR(255) NOT NULL,
     quantity_ordered INTEGER,
     chat_id VARCHAR(255),
     sold_price DECIMAL,
@@ -85,7 +85,7 @@ CREATE TABLE supplier (
 CREATE TABLE supply_order (
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     product_id INTEGER NOT NULL,
-    business_id INTEGER NOT NULL,
+    business_id VARCHAR(255) NOT NULL,
     supplier_id INTEGER NOT NULL,
     quantity_ordered INTEGER,
     order_status VARCHAR(255),
@@ -109,8 +109,8 @@ CREATE TABLE supplier_inventory (
 
 -- Table: visits
 CREATE TABLE visit (
-    customer_id INTEGER NOT NULL,
-    business_id INTEGER NOT NULL,
+    customer_id VARCHAR(255) NOT NULL,
+    business_id VARCHAR(255) NOT NULL,
     date_of_visit TIMESTAMP,
     visit_summary TEXT,
     orders_made INT,
@@ -124,7 +124,7 @@ CREATE TABLE visit (
 
 CREATE TABLE log_history (
 	log_id INTEGER AUTO_INCREMENT PRIMARY KEY,
-    business_id INTEGER NOT NULL,
+    business_id VARCHAR(255) NOT NULL,
     login_time TIMESTAMP,
     FOREIGN KEY (business_id) REFERENCES business(id)
 );

@@ -14,13 +14,16 @@ def add_business(
         contact_details : str,
         physical_address: str,
         dob:str,
+        bot_token: str,
         bot_username: str,
         bot_link: str) -> str:
     dob = datetime.datetime.strptime(dob,"%Y-%m-%d").date()
     date_joined = datetime.date.today()
-    values = (id, username, name, business_name, brief_description, date_joined, contact_details,physical_address,dob,True,bot_username, bot_link)
-    fmt = "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s"
-    columns = "(id, username, business_name, brief_description, date_joined, contact_details, physical_address, date_of_birth, active, bot_username, bot_link)"
+    values = (id, username, name, business_name, brief_description, date_joined, contact_details,physical_address,dob,True,bot_username, bot_link, bot_token)
+    # print(len(values))
+    fmt = "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s"
+    # print(len(fmt.split(", ")))
+    columns = "(id, username, name, business_name, brief_description, date_joined, contact_details, physical_address, date_of_birth, active, tg_bot_username, tg_bot_link, tg_bot_token)"
     return insert("business", columns, values, fmt)
 
 add_business.__doc__ = f"""
@@ -38,6 +41,7 @@ Args:
     contact_details (str): Email or phone number of the business.
     physical_address (str): The physical location of the business.
     dob (str): Date of birth in YYYY-MM-DD format.
+    bot_token (str): Bot token for the created bot.
     bot_username (str): Bot Username
     bot_link (str): Bot link
 
