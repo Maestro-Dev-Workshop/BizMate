@@ -17,7 +17,7 @@ load_dotenv()
 COMM  = os.environ["COMMS"]
 APP_NAME = "customer_service"
 RESET_QUOTA = int(os.environ["RESET_QUOTA"])
-LOGS_FOLDER_PATH = Path(r"C:\Users\VICTUS\Documents\Python\Everything Data\Deep Learning\llm_projects\Bizmate\cslogs")
+LOGS_FOLDER_PATH = Path(os.environ["LOGS_FOLDER_PATH"])
 
 def get_usernames(user):
     username = user.username

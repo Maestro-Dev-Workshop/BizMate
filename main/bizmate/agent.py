@@ -1,5 +1,6 @@
 import asyncio
 from main.database_manager.agent import orchestrator
+from main.data_analyst.agent import analyst_agent
 from google.adk.agents import Agent
 from main.utils.session_utils import *
 from main.bizmate.tools import *
@@ -73,7 +74,7 @@ bizmate = Agent(
 
     """,
     tools=[get_business_details,log]
-    ,sub_agents=[orchestrator]
+    ,sub_agents=[orchestrator, analyst_agent]
 )
 
 
