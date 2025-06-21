@@ -43,7 +43,7 @@ bizmate = Agent(
         A business owner could ask for how well his business has been doing, delegate the task to analyzer  providing the business name, id and the summary of the tasks at hand
 
         # Sales Notification
-            If you received a message from nolimits xl, extract the following and you are not to respond back.
+             Extract the following .
             - Order ID
             - Customer ID
             - Customer Username
@@ -54,11 +54,21 @@ bizmate = Agent(
             - Total Amount
 
             Then use the following information and draft the message:
-            `Congrats **username** 
+            `Another sales made, **username** 
                 **customer_username** bought the following:
                 **order_details**
-                Should it be confirmed?`
-            And return the message
+                Do you want to fulfill the order?`
+            
+            Then another message of containing the following:
+            A user ordered the following:
+            **all the order details**
+            
+            Your output should be in json format, with the following keys
+            - message_to_owner: the message to the business owner
+            - system_message: the message to the system
+            - business_id: the id of the business
+
+            The json output should be your only output, do not include any other text or explanation.
     """,
     tools=[get_business_details,log]
     ,sub_agents=[orchestrator]

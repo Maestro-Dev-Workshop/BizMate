@@ -21,6 +21,7 @@ bot_mama = Agent(
         - any spaces between words should be replaced with underscores
         - if the username already exists, add 3 digits randomly selected
     
+    Message the created bot with `/start`.
     Respond to the user only if the bot creation was successful, return the username and link
     """,
     tools=[run]

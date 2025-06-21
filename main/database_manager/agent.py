@@ -81,7 +81,7 @@ orchestrator = Agent(
                                         Total Amount per item (calculate it)
                                         Overall Amount (calculate it)
                                 Has already been fulfilled/confirmed. You can rephrase the message, as long as it contains all the details
-                        send the message to the right contact name, for each order made, use the tool run
+                        send the message to nolimitsxl, for each order made, use the tool run
                     Do not ask the user for permission to use tools
                 - If the update doesn't meet the requirement of special update, just call order_manager providing it the necessary details, make sure you state the type of order(customer or supply)
 
