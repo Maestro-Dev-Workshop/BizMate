@@ -157,6 +157,14 @@ class BizMateBot:
         print(agent_response)
         self.log(display_name, user_prompt, agent_response)
 
+        visuals_path = os.path.join(os.curdir, "BizMate", "main", "visuals", user_id)
+        visuals = os.listdir(visuals_path)
+        for img_name in visuals:
+            img_path = os.path.join(visuals_path, img)
+            with open(img_path, "rb") as img:
+                await self.bot.send_photo(message.chat.id, img, img_name.split(".")[0])
+            os.remove(img_path)
+
         await self.bot.send_message(message.chat.id, response)
 
     async def run(self):
