@@ -1,5 +1,9 @@
 from telebot.async_telebot import AsyncTeleBot
-from agent import *
+from bizmate.agent import bizmate
+from utils.session_utils import (
+    create_session,call_agent_async,get_session, call_agent_async_system, reset_session, create_runner, create_or_get_session)
+from utils.db_utils import cursor
+import datetime
 import os
 from dotenv import load_dotenv
 import random
@@ -14,7 +18,7 @@ APP_NAME = "bizmate_app"
 COMM = os.environ["COMMS"]
 
 class BizMateBot:
-    def __init__(self, session_service, bizmate, logs_folder_path):
+    def __init__(self, session_service, logs_folder_path):
         self.bot = AsyncTeleBot(os.environ["BIZ_TOK"])
         self.RESET_QUOTA = int(os.environ["RESET_QUOTA"])
         self.session_service = session_service
