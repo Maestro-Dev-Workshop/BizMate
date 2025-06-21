@@ -1,11 +1,11 @@
 from google.adk.agents import Agent
 from google.adk.tools import agent_tool
-from .inventory_manager.agent import inventory_agent
-from .order_manager.agent import order_manager
-from .supply_manager.agent import supply_agent
-from .the_registrar.agent import the_registrar
-from .tools import get_contact_details
-from main.tools import run
+from main.database_manager.inventory_manager.agent import inventory_agent
+from main.database_manager.order_manager.agent import order_manager
+from main.database_manager.supply_manager.agent import supply_agent
+from main.database_manager.the_registrar.agent import the_registrar
+from main.database_manager.tools import get_contact_details
+from main.utils.tg_utils import run
 
 orchestrator = Agent(
     name="Orchestrator",

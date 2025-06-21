@@ -1,4 +1,4 @@
-from ..utils.db_utils import db, cursor
+from main.utils.db_utils import db, cursor
 
 def get_contact_details(business_id:str):
     cursor.execute("""SELECT tg_bot_username FROM business WHERE id=%s""",(business_id,))
