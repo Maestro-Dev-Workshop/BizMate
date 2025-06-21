@@ -1,6 +1,6 @@
 from google.adk.runners import Runner
 from google.genai import types
-from google.adk.sessions import DatabaseSessionService
+from google.adk.sessions import InMemorySessionService, DatabaseSessionService
 
 async def create_session(app_name, user_id, session_id, session_service,**kwargs):
     session = await session_service.create_session(
@@ -64,7 +64,7 @@ async def call_agent_async(query: str, runner, user_id, session_id):
                 final_response_text = f"Agent escalated: {event.error_message or 'No specific message.'}"
             break
 
-    return final_response_text
+    return event.author,final_response_text
 
 
 async def call_agent_async_system(query: str, runner, user_id, session_id):
@@ -92,3 +92,4 @@ async def create_or_get_session(app_name, user_id, session_id, session_service, 
 
 db_url = "mysql+pymysql://root:root@localhost:3306/bizmate_session_service"
 session_service = DatabaseSessionService(db_url=db_url)
+# session_service = InMemorySessionService()
