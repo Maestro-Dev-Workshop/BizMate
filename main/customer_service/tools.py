@@ -355,11 +355,3 @@ def upload_customer_order(
     values_fmt = "%s, %s, %s, %s, %s, %s"
     result = insert(tbl_name, cols, values, values_fmt)
     return result
-
-if __name__ == "__main__":
-    print(get_business_info("1"))
-    # print(type(get_business_info("1")["date_joined"]))
-    # print(type(get_products_info("1")))
-    # print(get_specific_product_info("1", product_name="Toothbrush"))
-    # print(get_specific_product_info("1", product_id="3"))
-    pass

@@ -10,6 +10,7 @@ CREATE TABLE business (
     tg_bot_username VARCHAR(255),
     tg_bot_token VARCHAR(255),
     tg_bot_link VARCHAR(255),
+    chat_id VARCHAR(255),
     brief_description TEXT,
     date_joined DATE,
     contact_details VARCHAR(255),
@@ -52,11 +53,21 @@ CREATE TABLE customer_order (
     product_id INTEGER NOT NULL,
     business_id INTEGER NOT NULL,
     quantity_ordered INTEGER,
+    chat_id VARCHAR(255),
     sold_price DECIMAL,
     order_status VARCHAR(255),
     date_ordered TIMESTAMP,
     FOREIGN KEY (customer_id) REFERENCES customer(id),
     FOREIGN KEY (product_id) REFERENCES product(id),
+    FOREIGN KEY (business_id) REFERENCES business(id)
+);
+
+CREATE TABLE chat (
+	customer_id VARCHAR(255),
+    business_id VARCHAR(255),
+    chat_id VARCHAR(255),
+    PRIMARY KEY(customer_id, business_id, chat_id),
+    FOREIGN KEY (customer_id) REFERENCES customer(id),
     FOREIGN KEY (business_id) REFERENCES business(id)
 );
 

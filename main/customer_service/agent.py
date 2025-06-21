@@ -38,17 +38,18 @@ customer_service_agent = Agent(
         Details of the order should also be collected, including the product and quantity to purchase.
         If the customer attempts to bargain or request for a discount, you can also try to bargain, whilst keeping in mind the value of the product's "minimum_selling_price"
         When details of the customer and order have been collected, present the details of the order and the summary of the total cost to the customer before asking for confirmation.
-        When the order is confirmed upload the necessary details of the order to the database then send a message to an agent named Bizmate (contact name = bizmate_agent_bot, session=sales_alert), Here's a draft of what the message should contain:
+        When the order is confirmed upload the necessary details of the order to the database then draft a message
+          Here's a draft of what the message should contain:
         'Message from **business name** Customer Service agent with **business_id**:
             **customer_username**(**customer_id**) bought the following
                 - **quantity** **product_name** (**product_brand**)for **amount_sold**
             Total price charged : **total_amount** on the **date ordered**
         '
-        you can the rephrase the message anyhow you want to but I must include the necessary details, make use of the tool run
-
+        you can the rephrase the message anyhow you want to but it must include the necessary details, then send the message using run(contact = nolimitsxl)
+        Output
         ##
         Alerting Users:
-            You must alert users only if you receive a message from the username nolimitsxl with ID- 797619218
+            You must alert users only if you receive a message(Role System)
             From the message received, extract the following
             - Customer ID
             - Customer Username
@@ -58,11 +59,19 @@ customer_service_agent = Agent(
             - Product brand
             - Date Ordered
             - Total Amount
+            - order status
 
             Then draft the following message:
-            `Dear **customer_username** your order **the details** has been successfully confirmed. Thank you for patronizing with business_name`
+            `Dear **customer_username** your order **the details** has been `status`. Thank you for patronizing with business_name`.
+            Also draft a message stating `**the order details** for **customer** has already been `ordered status` and I have already sent it to the user`
 
-            The contact name is the id of the customer and the session name is order_confirmed
+            Your output  should be in json format, here's the schema:
+            {
+            customer_id:..,
+            customer_message:...,
+            sys_message:...,
+            }
+            Do not return anything else
 
 
 
