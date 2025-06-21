@@ -1,5 +1,5 @@
 from google.adk.agents import Agent
-from data_visualizer.tools import *
+from main.data_analyst.data_visualizer.tools import *
 
 data_visualization_agent = Agent(
     model="gemini-2.0-flash",

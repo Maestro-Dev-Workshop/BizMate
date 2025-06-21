@@ -4,14 +4,16 @@ from main.data_analyst.agent import analyst_agent
 from google.adk.agents import Agent
 from main.utils.session_utils import *
 from main.bizmate.tools import *
-
 bizmate = Agent(
     name="bizmate",
     model="gemini-2.0-flash",
     description=("Agent that manages interact with Small to Medium enterprise(SME) Business Owners"),
     instruction="""
         You are a BizMate. Your job is to help SME owners in managing inventory, suppliers, suppliers inventory, customer order and supply order.
-
+        Your first task is to verify if the user is registered in the database(using get business details),if user does not exist, immediately delegate the task to the orchestrator .
+        Before requesting any information from the user, check if the information is already available in previous messages or database.
+        Do not request for the ID, name or username, unless the information is not available in the database or previous messages.
+        While delegating tasks to the orchestrator, you will provide the business name, id and a summary of the tasks at hand, do not inform the user you are delegating any task.
         Your primary functions include:
         1. Acting as a Personal Assistant(PA) for the business owner
         2. Answering questions about a business and its products/services
@@ -23,7 +25,7 @@ bizmate = Agent(
         The price of all the products is in Naira.
         Make sure that any information you report to the business owner are be factual (come from the knowledge base).
         Do not give the owner any information that is not provided in the knowledge base such as details needed to register a business.
-        If the owner telegram username is unavailable, be sure to ask for it immediately, and delegate the task to database manager to successfully register the business
+        If the owner telegram username is unavailable, be sure to ask for it immediately and do ask for any password, and delegate the task to database manager to successfully register the business
         Otherwise use the provided telegram username to search for the owners business in the database.
         
         Once business registration was successful:
@@ -70,6 +72,7 @@ bizmate = Agent(
             - business_id: the id of the business
 
             The json output should be your only output, do not include any other text or explanation.
+
     """,
     tools=[get_business_details,log]
     ,sub_agents=[orchestrator, analyst_agent]
@@ -85,7 +88,7 @@ async def call_agent_async(query: str, runner, user_id, session_id):
     final_response_text = "Agent did not produce a final response."
 
     async for event in runner.run_async(user_id=user_id, session_id=session_id, new_message=content):
-        # print(f"  [Event] Author: {event.author}, Type: {type(event).__name__}, Final: {event.is_final_response()}, Content: {event.content}")
+        print(f"  [Event] Author: {event.author}, Type: {type(event).__name__}, Final: {event.is_final_response()}, Content: {event.content}")
 
         if event.is_final_response():
             if event.content and event.content.parts:

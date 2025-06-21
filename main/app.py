@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from customer_service.telegram_bot import CustomerServiceBot
 from bizmate.bizmate_tg import BizMateBot
 import asyncio
-from main.utils.session_utils import session_service
+from main.utils.session_utils import session_service,reset_session
 load_dotenv()
 
 
@@ -24,7 +24,7 @@ class BotManager:
         self.bizmate_bot = BizMateBot(session_service,BZ_LOGS_FOLDER_PATH)
         self.customer_service_bots = [
             CustomerServiceBot(session_service=session_service, token=token, logs_folder_path=CS_LOGS_FOLDER_PATH, business_id=id)
-            for id, token in self.cs_tokens
+            for id, token in self.cs_tokens if token != ""
         ]
         self.all_bot = [self.bizmate_bot] + self.customer_service_bots
     
@@ -38,6 +38,9 @@ class BotManager:
             if len(self.cs_tokens) < len(new_bots):
                 N_BOTS = len(self.cs_tokens) - 1
                 for id, token in new_bots[N_BOTS:]:
+                    if token == "":
+                        continue
+                    print("Adding new bot with ID:", id, "and token:", token)
                     new_bot = CustomerServiceBot(session_service=self.session_service, token=token, logs_folder_path=CS_LOGS_FOLDER_PATH, business_id=id)
                     self.customer_service_bots.append(new_bot)
                     self.all_bot.append(new_bot)
@@ -46,7 +49,7 @@ class BotManager:
             await asyncio.sleep(5)
 
     async def start_all(self):
-        tasks = [self.start_bot(bot) for bot in self.all_bot] + [self.add_bot()]
+        tasks = [self.start_bot(bot) for bot in self.all_bot if bot != ""] + [self.add_bot()]
         await asyncio.gather(*tasks)
 
     def get_cs_bot_token(self):
@@ -55,5 +58,13 @@ class BotManager:
     
 
 if __name__ == "__main__":
+    # asyncio.run(
+    # reset_session(
+    #     app_name="bizmate_app",
+    #     user_id="6217992152",
+    #     session_id="ENT6217992152_session",
+    #     session_service=session_service
+    # ))
     bot_manager = BotManager(session_service)
     asyncio.run(bot_manager.start_all())
+

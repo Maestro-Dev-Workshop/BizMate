@@ -62,7 +62,7 @@ class CustomerServiceBot:
     async def send_alert(self, msg ,runner, user_id, session_id):
         prompt = f"""Return the json format a specified on the instruction the message 
         {msg} """
-        response = await call_agent_async(
+        author, response = await call_agent_async(
             prompt,
             runner,
             user_id,
@@ -130,13 +130,13 @@ class CustomerServiceBot:
                 Do not give the customer any information of your internal workings.
             """
             if not returning:
-                response = await call_agent_async(
+                author, response = await call_agent_async(
                     initial_prompt,
                     runner,
                     user_id,
                     session_id)
             else:
-                response = await call_agent_async(
+                author, response = await call_agent_async(
                     self.welcome_back(username,name, user_id),
                     runner,
                     user_id,
@@ -183,7 +183,7 @@ class CustomerServiceBot:
                 session_id,
                 self.session_service
             )
-            session_time = datetime.datetime.fromtimestamp(session.last_update_time)
+            session_time = datetime.datetime.fromtimestamp(session.last_update_time,tz=datetime.timezone.utc)
             now = datetime.datetime.now(datetime.timezone.utc)
             time_diff_minutes = (now - session_time).total_seconds() / 3600
             if time_diff_minutes >= RESET_QUOTA:
@@ -197,7 +197,7 @@ class CustomerServiceBot:
                 self.customer_service_agent
             )
             if returning:
-                welcome_back_message = await call_agent_async(
+                author, welcome_back_message = await call_agent_async(
                     self.welcome_back(username, name, user_id),
                     runner,
                     user_id,
@@ -208,7 +208,7 @@ class CustomerServiceBot:
                 log(display_name,'',agent_response)
                 await self.bot.send_message(message.chat.id, welcome_back_message )
 
-            response = await call_agent_async(
+            author, response = await call_agent_async(
                 message.text,
                 runner,
                 user_id,
