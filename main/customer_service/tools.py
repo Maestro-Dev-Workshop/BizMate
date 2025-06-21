@@ -1,8 +1,7 @@
 import sys
 import os
-
+from main.utils.db_utils import *
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from database_manager.tools import *
 import datetime
 
 

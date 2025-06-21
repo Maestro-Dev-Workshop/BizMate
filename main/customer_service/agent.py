@@ -1,9 +1,6 @@
-import asyncio
 from google.adk.agents import Agent
-from main.session_utils import *
-from tools import *
-from main.tools import run
-
+from customer_service.tools import *
+from utils.tg_utils import run
 customer_service_agent = Agent(
     name="customer_service_agent",
     model="gemini-2.0-flash",
@@ -90,37 +87,3 @@ customer_service_agent = Agent(
         run
     ]
 )
-
-async def main():
-    APP_NAME = "bizmate_test_app"
-    USER_ID = "user_1"
-    SESSION_ID = "session_001"
-    session = await create_session(APP_NAME, USER_ID, SESSION_ID, session_service)
-    runner = create_runner(APP_NAME, session_service, customer_service_agent)
-
-    async def run_conversation():
-        business_id = "1"
-        customer_username = "blaze"
-        initial_prompt = f"""
-            This is a message from the business admin.
-            The id of the business in the database is {business_id}. Use your tools to extract basic information about the business and its products.
-            Ensure to greet the customer and provide a very brief description of the business, including the name and services offered.
-            The telegram username of the customer you're currently serving is {customer_username}. Confirm if the customer already exists in the database before interacting.
-            From now on you will be engaging with the customer.
-        """
-        initial_response = await call_agent_async(initial_prompt, runner, USER_ID, SESSION_ID)
-        print(f">>> Agent: {initial_response}")
-
-        running = True
-        while running:
-            user_query = input(">>> User: ")
-            if user_query == "q":
-                running = False
-            else:
-                response = await call_agent_async(user_query, runner, USER_ID, SESSION_ID)
-                print(f">>> Agent: {response}")
-    
-    await run_conversation()
-
-if __name__ == "__main__":
-    asyncio.run(main())

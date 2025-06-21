@@ -1,19 +1,23 @@
 import sqlalchemy.exc
 from telebot.async_telebot import AsyncTeleBot
 import sqlalchemy
-from agent import *
-from database_manager.db_utils import *
-import random
-import json
 from dotenv import load_dotenv
+import os
+from pathlib import Path
+from customer_service.agent import customer_service_agent
+import datetime
+from main.utils.session_utils import *
+from main.utils.db_utils import cursor, db
+import json
+
 
 load_dotenv()
 
 
 COMM  = os.environ["COMMS"]
 APP_NAME = "customer_service"
-LOGS_FOLDER_PATH = Path("C:\Users\VICTUS\Documents\Python\Everything Data\Deep Learning\llm_projects\Bizmate\customer_logs")
 RESET_QUOTA = int(os.environ["RESET_QUOTA"])
+LOGS_FOLDER_PATH = Path(r"C:\Users\VICTUS\Documents\Python\Everything Data\Deep Learning\llm_projects\Bizmate\cslogs")
 
 def get_usernames(user):
     username = user.username
@@ -32,7 +36,7 @@ def log(display_name, user_prompt, agent_response):
         file.write(user_prompt + agent_response)
 
 class CustomerServiceBot:
-    def __init__(self, token, session_service, customer_service_agent, business_id, logs_folder_path):
+    def __init__(self, token, session_service, business_id, logs_folder_path):
         self.token = token
         self.session_service = session_service
         self.customer_service_agent = customer_service_agent

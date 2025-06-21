@@ -3,7 +3,7 @@ USE bizdb;
 
 -- Table: businesses
 CREATE TABLE business (
-    id INTEGER PRIMARY KEY,
+    id VARCHAR(255) PRIMARY KEY,
     username VARCHAR(255),
     name VARCHAR(255),
     business_name VARCHAR(255),
@@ -38,7 +38,7 @@ CREATE TABLE product (
 
 -- Table: customers
 CREATE TABLE customer (
-    id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    id VARCHAR(255) PRIMARY KEY,
     username VARCHAR(255),
     name VARCHAR(255),
     age INT,
@@ -127,12 +127,4 @@ CREATE TABLE log_history (
     business_id INTEGER NOT NULL,
     login_time TIMESTAMP,
     FOREIGN KEY (business_id) REFERENCES business(id)
-);
-
-CREATE TABLE non_active (
-	business_id INTEGER NOT NULL,
-	active BOOLEAN,
-	why_leave TEXT,
-    PRIMARY KEY (business_id),
-    FOREIGN KEY (business_id) REFERENCES business (id)
 );

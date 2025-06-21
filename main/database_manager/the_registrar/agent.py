@@ -1,12 +1,7 @@
 from google.adk.agents import Agent
 from google.adk.tools import agent_tool
-import asyncio
 from .botmama.agent import bot_mama
 from .tools import *
-from google.adk.sessions import InMemorySessionService
-from google.adk.runners import Runner
-from google.genai import types
-
 
 the_registrar = Agent(
     name="the_registrar",
