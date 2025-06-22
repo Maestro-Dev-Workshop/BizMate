@@ -59,26 +59,28 @@ class CustomerServiceBot:
         # Register handlers
         self._register_handlers()
     
-    async def send_alert(self, msg ,runner, user_id, session_id):
+    async def send_alert(self, msg, user_id,runner, session_id):
         prompt = f"""Return the json format a specified on the instruction the message 
         {msg} """
-        author, response = await call_agent_async(
+        author ,response = await call_agent_async(
             prompt,
             runner,
             user_id,
             session_id
         )
         data = json.loads(response.strip().removeprefix('```json').removesuffix('```').strip())
-        chat_id = cursor.execute("""SELECT chat_id FROM chat WHERE customer_id = %s AND business_id = %s""", (data['customer_id'], self.business_id)).fetchone()
-        self.bot.send_message(chat_id[0], data['message_to_owner'])
+        chat_id = cursor.execute("""SELECT chat_id FROM chat WHERE customer_id = %s AND business_id = %s""", (data['customer_id'], self.business_id))
+        chat_id = cursor.fetchone()
+        print(data["customer_id"],chat_id[0])
+        await self.bot.send_message(chat_id[0], data['customer_message'])
         session_customer = await get_session(
                 APP_NAME,
-                user_id,
-                f"{chat_id}_session",
+                chat_id[0],
+                f"{chat_id[0]}_session",
                 self.session_service
             )
         runner.session = session_customer
-        await call_agent_async_system(data['sys_message'], runner, user_id, f"{chat_id}_session")
+        await call_agent_async_system(data['sys_message'], runner, chat_id[0], f"{chat_id[0]}_session")
 
     def _register_handlers(self):
         @self.bot.message_handler(commands=["hello", "start"])
@@ -91,7 +93,7 @@ class CustomerServiceBot:
             display_name = username or name
             chat_id = message.chat.id
             print(username, "-", name)
-
+            await self.bot.send_chat_action(chat_id, action='typing')
             session_id = f"{chat_id}_session"
             try:
                 session = await create_session(
@@ -101,10 +103,6 @@ class CustomerServiceBot:
                     self.session_service,
                     state={"chat_id": chat_id}
                 )
-                cursor.execute(
-                    "INSERT INTO chat (customer_id, business_id, chat_id) VALUES (%s, %s, %s)",
-                    (user_id, self.business_id, chat_id))
-                db.commit()
             except sqlalchemy.exc.IntegrityError:
                 returning = True
                 session = await reset_session(
@@ -163,7 +161,7 @@ class CustomerServiceBot:
             name = name or "<not-available>"
             display_name = username or name
             chat_id = message.chat.id
-
+            await self.bot.send_chat_action(chat_id, action='typing')
             if username == COMM:
                 session = await create_or_get_session(APP_NAME, user_id, f"{chat_id}_session", self.session_service, state={"chat_id": chat_id})
                 runner = create_runner(
@@ -171,7 +169,7 @@ class CustomerServiceBot:
                     self.session_service,
                     self.customer_service_agent
                 )
-                await self.send_alert(message.text, runner, user_id, f"{chat_id}_session")
+                await self.send_alert(message.text, user_id,runner,  f"{chat_id}_session")
                 return
             
             user_prompt = f"{display_name}: {message.text}\n"
@@ -208,7 +206,7 @@ class CustomerServiceBot:
                 print(agent_welcome_back_message)
                 log(display_name,'',agent_response)
                 await self.bot.send_message(message.chat.id, welcome_back_message )
-
+            print("wdw")
             author, response = await call_agent_async(
                 message.text,
                 runner,

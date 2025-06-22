@@ -22,10 +22,10 @@ class BotManager:
         self.session_service = session_service
         self.cs_tokens = self.get_cs_bot_token()
         self.bizmate_bot = BizMateBot(session_service,BZ_LOGS_FOLDER_PATH)
-        self.customer_service_bots = [
-            CustomerServiceBot(session_service=session_service, token=token, logs_folder_path=CS_LOGS_FOLDER_PATH, business_id=id)
-            for id, token in self.cs_tokens if token != ""
-        ]
+        self.customer_service_bots = []
+        for id, token in self.cs_tokens:
+            if (token != "") and isinstance(token, str):
+                self.customer_service_bots.append(CustomerServiceBot(session_service=session_service, token=token, logs_folder_path=CS_LOGS_FOLDER_PATH, business_id=id))
         self.all_bot = [self.bizmate_bot] + self.customer_service_bots
     
     async def start_bot(self, bot):
@@ -62,13 +62,6 @@ class BotManager:
     
 
 if __name__ == "__main__":
-    # asyncio.run(
-    # reset_session(
-    #     app_name="bizmate_app",
-    #     user_id="1362251018",
-    #     session_id="ENT1362251018_session",
-    #     session_service=session_service
-    # ))
     bot_manager = BotManager(session_service)
     asyncio.run(bot_manager.start_all())
 

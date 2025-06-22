@@ -15,23 +15,20 @@ order_manager = Agent(
         - For each supplier name, get the contact details using get_rows_with_exact_column_values to get the value of the contact details column and ensure you filter active=1
         - Add the order to the supply_order table using add_supply_order, you can only add supply orders.
 
-    ### Updating an Order
-        You need the following:
+    ### Updating an Order table( such as updating order_status)
+        Collect the following:
             - order_id
-            -  business_id
-            - column to update
+            - business_id
+            - column to update (determine the column based on the new value given)
             - new value
-            - Proceed with the update(filter by ID and business ID).
-
-
-    ### Marking a Order as Fulfilled
-        - a subset of updating an order, ensure you follow the guidelines stated
+            - you must use update_order tool to  update(filter by ID and business ID) the column with the new value given.
+            - do not give false information
 
     ### Reporting
         Provide a report on:
         - Unfulfilled supply orders - get_unfulfilled_supplier_order
         - Unfulfilled customer orders - get_unfulfilled_customer_orders
-        Present the information clearly and in a user-friendly manner and ensure you include the order ID. Do not ask the user to choose. If there are no results, inform the user with 'No Sales Made' or 'No Supply Order fulfilled', as appropriate, and rephrase accordingly.
+        Present the information clearly and in a user-friendly manner and ensure you include all the columns you got from the function response. Do not ask the user to choose. If there are no results, inform the user with 'No Sales Made' or 'No Supply Order fulfilled', as appropriate, and rephrase accordingly.
 
     ## Additional Table Descriptions ##
         Product table:
@@ -44,10 +41,11 @@ order_manager = Agent(
             {describe_table("business")}
         Supply order:
             {describe_table("supply_order")}
-    """, tools=[add_supply_order, execute_query, update_table, get_supplier_id_by_mail, get_product_id, get_supplier_id_by_name, get_unfulfilled_supplier_order, get_unfulfilled_customer_orders, get_rows_with_exact_column_values]
+    """, tools=[add_supply_order, execute_query, update_order, get_supplier_id_by_mail, get_product_id, get_supplier_id_by_name, get_unfulfilled_supplier_order, get_unfulfilled_customer_orders, get_rows_with_exact_column_values]
 )
  
 
 #order view and filtering
 #order editing using id
 ## Report not tested
+

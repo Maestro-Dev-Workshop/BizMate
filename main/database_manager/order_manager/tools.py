@@ -79,6 +79,7 @@ def get_unfulfilled_customer_orders(
     query = """
     SELECT 
         co.id AS order_id,
+        c.id AS customer_id,
         c.name AS customer_name,
         c.contact_details AS customer_contact,
         p.id AS product_id,
@@ -96,6 +97,25 @@ def get_unfulfilled_customer_orders(
     """
     cursor.execute(query, (business_id,"pending"))
     return f"""{cursor.fetchall()}"""
+
+def update_order(tbl :str,order_id:str, business_id:str, column:str, new_value:str):
+    """
+    Updates a specific column value for an order in the given table.
+    Args:
+        tbl (str): The name of the table to update, accepted values are supply_order or customer_order.
+        order_id (int or str): The unique identifier of the order to update.
+        business_id (int or str): The unique identifier of the business associated with the order.
+        column (str): The name of the column to update.
+        new_value (Any): The new value to set for the specified column.
+    Returns:
+        bool: The state of the update operation
+    """
+
+    print(tbl,order_id, business_id, column, new_value)
+    state = update_table(tbl, ["id", "business_id"], [order_id,business_id],[column], [new_value])
+    print(state)
+    return state
+
 
 
 get_supplier_id_by_name.__doc__ = f"""
@@ -131,7 +151,7 @@ get_unfulfilled_supplier_order.__doc__ = f"""
 
     
     Returns:
-        Unfulfilled supplier Orders
+        Unfulfilled supplier Orders with details:order_id,item_name,supplier_name,quantity_ordered,date_ordered
     """
 
 get_unfulfilled_customer_orders.__doc__ = f"""
@@ -141,7 +161,7 @@ get_unfulfilled_customer_orders.__doc__ = f"""
     business_id[str] : ID of the business
 
     Returns:
-        Unfulfilled Customer Orders
+        Unfulfilled Customer Orders with details: order_id,customer_id,customer_name,customer_contact,product_id,product_name,category,brand,quantity_ordered,sold_price,date_ordered
     """
 
 # Item Name: Protein Shake (Vanilla, 500ml)
@@ -149,3 +169,4 @@ get_unfulfilled_customer_orders.__doc__ = f"""
 # Quantity: 120
 # Supplier Name: NutriWell Distributors
 # print(get_unfulfilled_supplier_order("2"))
+print(get_unfulfilled_customer_orders(1362251018))

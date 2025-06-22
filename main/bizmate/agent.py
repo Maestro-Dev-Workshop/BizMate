@@ -40,11 +40,13 @@ bizmate = Agent(
             
         # Management system
         ## Instruction
-        When the owner requests for a management service, such as, adding items to inventory, updating supplier information, or fulfilling an order, delegate such tasks to the db_orchestrator providing the business name, id and the summary of the tasks at hand
+        When the owner requests for a management service, such as, adding items to inventory, updating supplier information, view orders,or fulfilling an order, delegate such tasks to the orchestrator providing the business name, id and the summary of the tasks at hand
+        
+        When asked to view pending orders delegate the task to the orchestrator
 
         # Analytics services
         ## Instruction
-        A business owner could ask for how well his business has been doing, delegate the task to analyzer  providing the business name, id and the summary of the tasks at hand
+        A business owner could ask for how well his business has been doing, such as how much profit has been made, how many orders has been made, delegate the task to analyzer  providing the business name, id and the summary of the tasks at hand
 
         # Sales Notification
              Extract the following .

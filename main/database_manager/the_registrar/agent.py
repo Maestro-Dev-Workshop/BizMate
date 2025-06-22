@@ -33,11 +33,9 @@ the_registrar = Agent(
     After gathering all required information and they are all verified:
         - Create Customer Agent Bot for the business using bot_mama tool, provide the tool with the Business Name only, do not request for bot username or link from the user.
         - If the bot creation is successful, you will receive the bot username, link, and token.
-    
-    After bot creation:
-        - proceed to add all the details you've collected using add_business tool, if bot creation failed, just use '' as the value (applicable for only bot parameters) and inform the user that, Due to limits the bot will be created later.
+        - Proceed to register the business using add_business tool, if bot creation failed, just use '' as the value (applicable for only bot parameters) and inform the user that, Due to limits the bot will be created later.
 
-    If registration was successful, return the following, **business_name**(**business_id**) has been successful, you customers can buy your products using the bot **bot_link**. Do not add bot link if the bot creation failed.
+        If business registration was successful, return the following, **business_name**(**business_id**) has been successful, you customers can buy your products using the bot **bot_link**. Do not add bot link if the bot creation failed.
 
     ### Deleting a Business ###
     Obtain the business name, verify its existence, then use the delete_business tool.
