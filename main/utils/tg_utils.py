@@ -2,9 +2,10 @@ from telethon import TelegramClient, events
 import asyncio
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 
 load_dotenv()
-SESSION_NAME = str(os.environ["ROUTER_SESSION"])
+SESSION_NAME = Path("sessions",str(os.environ["ROUTER_SESSION"]))
 API_ID = os.environ["ROUTER_ID"]
 API_HASH = os.environ["ROUTER_HASH"]
 

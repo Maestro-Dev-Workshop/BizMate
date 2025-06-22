@@ -1,5 +1,5 @@
 from google.adk.agents import Agent
-from .tools import *
+from main.database_manager.supply_manager.tools import *
 
 supply_agent = Agent(
     name="supply_manager",

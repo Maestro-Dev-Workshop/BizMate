@@ -1,6 +1,6 @@
 from google.adk.agents import Agent
-from customer_service.tools import *
-from utils.tg_utils import run
+from main.customer_service.tools import *
+from main.utils.tg_utils import run
 
 customer_service_agent = Agent(
     name="customer_service_agent",

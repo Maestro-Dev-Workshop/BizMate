@@ -4,7 +4,7 @@ import sqlalchemy
 from dotenv import load_dotenv
 import os
 from pathlib import Path
-from customer_service.agent import customer_service_agent
+from main.customer_service.agent import customer_service_agent
 import datetime
 from main.utils.session_utils import *
 from main.utils.db_utils import cursor, db
@@ -31,12 +31,11 @@ def get_usernames(user):
     return username, name
 
 class CustomerServiceBot:
-    def __init__(self, token, session_service, business_id, logs_folder_path):
+    def __init__(self, token, session_service, business_id):
         self.token = token
         self.session_service = session_service
         self.customer_service_agent = customer_service_agent
         self.business_id = business_id
-        self.logs_folder_path = logs_folder_path
         self.welcome_back = lambda username, name, user_id: f"""
                 This is a message from the business admin.
                 The id of the business in the database is {self.business_id}. Use your tools to extract basic information about the business and its products.

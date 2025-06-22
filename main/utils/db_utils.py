@@ -1,19 +1,7 @@
-import mysql.connector
-from dotenv import load_dotenv
+
 import datetime
 from decimal import Decimal
-
-# Local
-local = {
-    "host":"localhost",
-    "user":"root",
-    "password":"root",
-    "database":"bizdb"
-}
-
-db = mysql.connector.connect(**local)
-cursor =db.cursor()
-
+from main.utils.db_conn import db, cursor
 
 
 def serialize_dict(obj):

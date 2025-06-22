@@ -1,7 +1,7 @@
 from google.adk.agents import Agent
 from google.adk.tools import agent_tool
-from .botmama.agent import bot_mama
-from .tools import *
+from main.database_manager.the_registrar.botmama.agent import bot_mama
+from main.database_manager.the_registrar.tools import *
 
 the_registrar = Agent(
     name="the_registrar",

@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.session
+.git
+.gitignore
+.vscode
+*.sql
+LICENSE
+README.md
+pyvenv.cfg
+Scripts/
+Include/
+Lib/
+share/

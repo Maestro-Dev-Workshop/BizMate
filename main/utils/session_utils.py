@@ -1,7 +1,7 @@
 from google.adk.runners import Runner
 from google.genai import types
 from google.adk.sessions import InMemorySessionService, DatabaseSessionService
-
+from main.utils.db_conn import DB_URL
 async def create_session(app_name, user_id, session_id, session_service,**kwargs):
     session = await session_service.create_session(
         app_name=app_name,
@@ -91,6 +91,7 @@ async def create_or_get_session(app_name, user_id, session_id, session_service, 
     except Exception as e:
         return await create_session(app_name, user_id, session_id, session_service, **kwargs)
 
-db_url = "mysql+pymysql://root:root@localhost:3306/bizmate_session_service"
-session_service = DatabaseSessionService(db_url=db_url)
+
+
+session_service = DatabaseSessionService(db_url=DB_URL)
 # session_service = InMemorySessionService()

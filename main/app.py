@@ -1,29 +1,21 @@
 from pathlib import Path
 import os
-from utils.db_utils import cursor,db
+from main.utils.db_utils import cursor,db
 from dotenv import load_dotenv
-
-
-from customer_service.telegram_bot import CustomerServiceBot
-from bizmate.bizmate_tg import BizMateBot
+from main.customer_service.telegram_bot import CustomerServiceBot
+from main.bizmate.bizmate_tg import BizMateBot
 import asyncio
 from main.utils.session_utils import session_service,reset_session
-load_dotenv()
 
-
-
-
-BZ_LOGS_FOLDER_PATH = Path(r"C:\Users\VICTUS\Documents\Python\Everything Data\Deep Learning\llm_projects\Bizmate\bizlogs")
-CS_LOGS_FOLDER_PATH = Path(r"C:\Users\VICTUS\Documents\Python\Everything Data\Deep Learning\llm_projects\Bizmate\cslogs")
 
 class BotManager:
     def __init__(self, session_service):
         self.bot_tokens = os.environ["BIZ_TOK"]
         self.session_service = session_service
         self.cs_tokens = self.get_cs_bot_token()
-        self.bizmate_bot = BizMateBot(session_service,BZ_LOGS_FOLDER_PATH)
+        self.bizmate_bot = BizMateBot(session_service)
         self.customer_service_bots = [
-            CustomerServiceBot(session_service=session_service, token=token, logs_folder_path=CS_LOGS_FOLDER_PATH, business_id=id)
+            CustomerServiceBot(session_service=session_service, token=token, business_id=id)
             for id, token in self.cs_tokens if token != ""
         ]
         self.all_bot = [self.bizmate_bot] + self.customer_service_bots
@@ -45,7 +37,7 @@ class BotManager:
                 if (id, token) in self.cs_tokens:
                     continue
                 print("Adding new bot with ID:", id, "and token:", token)
-                new_bot = CustomerServiceBot(session_service=self.session_service, token=token, logs_folder_path=CS_LOGS_FOLDER_PATH, business_id=id)
+                new_bot = CustomerServiceBot(session_service=self.session_service, token=token, business_id=id)
                 self.cs_tokens.append((id, token))
                 asyncio.create_task(self.start_bot(new_bot))
             await asyncio.sleep(5)
@@ -62,13 +54,6 @@ class BotManager:
     
 
 if __name__ == "__main__":
-    # asyncio.run(
-    # reset_session(
-    #     app_name="bizmate_app",
-    #     user_id="6217992152",
-    #     session_id="ENT6217992152_session",
-    #     session_service=session_service
-    # ))
     bot_manager = BotManager(session_service)
     asyncio.run(bot_manager.start_all())
 
