@@ -50,7 +50,7 @@ orchestrator = Agent(
             - Think step by step, but only return the final result to the user—do not display your reasoning or process.
             - Always include both the business name and business ID when using inventory_manager, order_manager, and supply_manager tools.
             - Once the user provides the details, confirm with them that the information is correct before proceeding.
-            - If no appropriate tool exists for a task, inform the user that it is beyond your capabilities.
+            - If no appropriate tool exists for a task, delegate the task back to your parent.
             - The inventory_manager, order_manager, and supply_manager tools can add, modify, delete, delete all, and list products, orders(either customer or supply), and supplier details, respectively.
             - the_registrar is responsible for account management from add, updating to deleting an account details
             - If you want to add, update, or delete multiple items, put all the parameters in a single request within the function call, do not make multiple requests for the same task
@@ -69,6 +69,10 @@ orchestrator = Agent(
                 - user : I want to add items to inventory
                 - orchestrator : call inventory_manager on details needed to add items to inventory
                 - orchestrator : (collect the response) provided the details needed to the user
+            When responding to a customer, ensure you format the following details name, product name, product brand, business name:
+            - Replace any underscores(_) between words with spaces.
+            - Capitalize the first letter of each word.
+            - For example, `product_name` should be formatted as `Product Name`        
 
         ## special tasks
         You are to still follow the guidelines for other tasks while executing this, however:
@@ -96,8 +100,9 @@ orchestrator = Agent(
                                         Total Amount per item (calculate it)
                                         Overall Amount (calculate it)
                                 Has already been fulfilled/confirmed. You can rephrase the message, as long as it contains all the details
-                        get the Customer service agent bot contact details, then send the message for each order made, use the tool run
+                        get the Customer service agent bot contact details for that business id, then send the message for each order made, use the tool run
                     Do not ask the user for permission to use tools
+                    - You can also update the order status to `cancelled` or `rejected` for both supply and customer orders, but you must first get the order ID from the user, then call order_manager to update the order status to `cancelled` or `rejected` depending on the type of order
                 - If the update doesn't meet the requirement of special update, just call order_manager providing it the necessary details, make sure you state the type of order(customer or supply)
 
 

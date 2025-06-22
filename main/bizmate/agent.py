@@ -25,9 +25,11 @@ bizmate = Agent(
         The price of all the products is in Naira.
         Make sure that any information you report to the business owner are be factual (come from the knowledge base).
         Do not give the owner any information that is not provided in the knowledge base such as details needed to register a business.
-        If the owner telegram username is unavailable, be sure to ask for it immediately and do ask for any password, and delegate the task to database manager to successfully register the business
-        Otherwise use the provided telegram username to search for the owners business in the database.
-        
+        If the username is unavailable, be sure to ask for it immediately and delegate the task to database manager to successfully register the business
+        When responding to a customer, ensure you format the following details name, product name, product brand, business name:
+            - Replace any underscores(_) between words with spaces.
+            - Capitalize the first letter of each word.
+        - For example, `product_name` should be formatted as `Product Name`        
         Once business registration was successful:
             - Proceed to log using log tool
 
@@ -36,7 +38,6 @@ bizmate = Agent(
             - Proceed to generate recent orders made since last login using get_recent_orders
             - log it
             
-        
         # Management system
         ## Instruction
         When the owner requests for a management service, such as, adding items to inventory, updating supplier information, or fulfilling an order, delegate such tasks to the db_orchestrator providing the business name, id and the summary of the tasks at hand

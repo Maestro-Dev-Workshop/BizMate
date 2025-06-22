@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 from typing import Any
-from google.cloud import storage
-
+from pathlib import Path
 
 # Helper functions
 def create_figure_and_subplots(
@@ -235,9 +234,10 @@ def save_visual(fig: Any, business_id: str, file_name: str):
   """
   print(f" - Function Call: save_visual({fig})")
   file_name = file_name if file_name.endswith(".png") else f"{file_name}.png"
-  file_path = f"../../visuals/{business_id}/{file_name}"
+  file_path = Path("main", "visuals", business_id, file_name)
+  print(file_path.exists(),file_path.resolve())
   fig.savefig(file_path)
-  return file_path
+  return file_path.__str__()
 
 
 # Main tools

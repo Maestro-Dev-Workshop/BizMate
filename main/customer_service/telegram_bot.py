@@ -99,6 +99,7 @@ class CustomerServiceBot:
                     user_id,
                     session_id,
                     self.session_service,
+                    state={"chat_id": chat_id}
                 )
                 cursor.execute(
                     "INSERT INTO chat (customer_id, business_id, chat_id) VALUES (%s, %s, %s)",
@@ -111,7 +112,7 @@ class CustomerServiceBot:
                     user_id,
                     session_id,
                     self.session_service,
-                    state={"id":"","message":""}
+                    state={"chat_id": chat_id}
                 )
             
             runner = create_runner(
@@ -164,7 +165,7 @@ class CustomerServiceBot:
             chat_id = message.chat.id
 
             if username == COMM:
-                session = await create_or_get_session(APP_NAME, user_id, f"{chat_id}_session", self.session_service)
+                session = await create_or_get_session(APP_NAME, user_id, f"{chat_id}_session", self.session_service, state={"chat_id": chat_id})
                 runner = create_runner(
                     APP_NAME,
                     self.session_service,
@@ -187,7 +188,7 @@ class CustomerServiceBot:
             now = datetime.datetime.now(datetime.timezone.utc)
             time_diff_minutes = (now - session_time).total_seconds() / 3600
             if time_diff_minutes >= RESET_QUOTA:
-                session = await reset_session(APP_NAME, user_id, session_id, session_service)
+                session = await reset_session(APP_NAME, user_id, session_id, session_service, state={"chat_id": chat_id})
                 returning = True
             
 

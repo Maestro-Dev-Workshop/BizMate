@@ -74,7 +74,7 @@ CREATE TABLE chat (
 -- Table: suppliers
 CREATE TABLE supplier (
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
-    business_id INTEGER NOT NULL,
+    business_id VARCHAR(255) NOT NULL,
     `active` BOOLEAN,
     name VARCHAR(255),
     contact_details VARCHAR(255),

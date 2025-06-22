@@ -2,6 +2,7 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from main.utils.db_utils import *
+from google.adk.tools import ToolContext
 import datetime
 
 
@@ -16,14 +17,15 @@ def add_business(
         dob:str,
         bot_token: str,
         bot_username: str,
-        bot_link: str) -> str:
+        bot_link: str,
+        tool_context: ToolContext) -> str:
     dob = datetime.datetime.strptime(dob,"%Y-%m-%d").date()
     date_joined = datetime.date.today()
-    values = (id, username, name, business_name, brief_description, date_joined, contact_details,physical_address,dob,True,bot_username, bot_link, bot_token)
-    # print(len(values))
-    fmt = "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s"
+    chat_id = tool_context.state.get("chat_id", None)
+    values = (id, username, name, business_name, brief_description, date_joined, contact_details,physical_address,dob,True,bot_username, bot_link, bot_token,chat_id)
+    fmt = "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s"
     # print(len(fmt.split(", ")))
-    columns = "(id, username, name, business_name, brief_description, date_joined, contact_details, physical_address, date_of_birth, active, tg_bot_username, tg_bot_link, tg_bot_token)"
+    columns = "(id, username, name, business_name, brief_description, date_joined, contact_details, physical_address, date_of_birth, active, tg_bot_username, tg_bot_link, tg_bot_token, chat_id)"
     return insert("business", columns, values, fmt)
 
 add_business.__doc__ = f"""
