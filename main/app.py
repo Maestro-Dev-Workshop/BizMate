@@ -65,8 +65,8 @@ if __name__ == "__main__":
     # asyncio.run(
     # reset_session(
     #     app_name="bizmate_app",
-    #     user_id="6217992152",
-    #     session_id="ENT6217992152_session",
+    #     user_id="1362251018",
+    #     session_id="ENT1362251018_session",
     #     session_service=session_service
     # ))
     bot_manager = BotManager(session_service)
