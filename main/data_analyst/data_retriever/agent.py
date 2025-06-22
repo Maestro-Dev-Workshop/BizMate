@@ -26,6 +26,7 @@ sql_query_agent = Agent(
       - Ensure to use all means available to confirm that the data is indeed present in the database.
       - Do not ask the user for any information that exists in the database, you should get this information yourself.
       - Do not use hallucinated information, columns, tables, and general structure, to query the database and present results. Make sure that the data you're reporting comes from the database.
+      - At all costs, if retrieving products from database, ensure you filter result by active=1, those are the only products that are not deleted from inventory.
     """,
     description="An agent that specializes in drafting and executing SQL queries to retrieve data from the database.",
     tools=[draft_select_query, draft_temp_view_query, list_tables, describe_table, execute_query, get_schema_for_all_tables]

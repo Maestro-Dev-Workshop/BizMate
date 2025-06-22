@@ -291,4 +291,3 @@ delete_row.__doc__ = f"""
     Returns:
         whether the delete operation was successful
     """
-

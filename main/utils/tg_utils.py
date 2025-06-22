@@ -4,22 +4,23 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
+SESSION_NAME = str(os.environ["ROUTER_SESSION"])
 API_ID = os.environ["ROUTER_ID"]
 API_HASH = os.environ["ROUTER_HASH"]
 
 
 async def send_message(message, contact):
-    client = TelegramClient('anon', API_ID, API_HASH)
+    client = TelegramClient(SESSION_NAME, API_ID, API_HASH)
     await client.start()
     ent = await client.get_entity(entity=contact)
     await client.send_message(ent,message)
-    await asyncio.sleep(2)
+    await asyncio.sleep(3)
     message = [msg.text async for msg in client.iter_messages(ent, limit=1)]
     await client.disconnect()
     return message
 
 async def receive_message(contact):
-    client = TelegramClient('anon', API_ID, API_HASH)
+    client = TelegramClient(SESSION_NAME, API_ID, API_HASH)
     await client.start()
     ent = await client.get_entity(entity=contact)
     message = [msg.text async for msg in client.iter_messages(ent, limit=1)]
@@ -45,3 +46,5 @@ contact(str): Name of the contact
 Returns:
 The response of the sender
 """
+
+# asyncio.run(run("send_message", "Hello, this is a test message!", "nolimitsxl"))

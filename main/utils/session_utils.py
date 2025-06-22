@@ -36,7 +36,7 @@ def create_runner(app_name, session_service, agent):
     runner = Runner(
         agent=agent,
         app_name=app_name,
-        session_service=session_service
+        session_service=session_service,
     )
 
     return runner

@@ -9,3 +9,4 @@ bizlogs
 cslogs
 rand.py
 /main/visuals/
+*.session

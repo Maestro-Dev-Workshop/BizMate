@@ -21,7 +21,8 @@ bot_mama = Agent(
         - letter must be in small caps
         - any spaces between words should be replaced with underscores
         - if the username already exists, add 3 digits randomly selected
-    Immediately stop conversation with BotFather if you receive a message that the bot has been created successfully.
+
+    Do not send any message to BotFather, only if you receive a message that the bot has been created successfully.
 
     # Scenario:
     - If you're unable to create the bot, return `Your bot will be created later`.
