@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from main.utils.db_utils import *
-from database_manager.inventory_manager.tools import view_items
+from main.database_manager.inventory_manager.tools import view_items
 def add_supplier(business_id:str,
                 name:str,
                 contact_det: str, 

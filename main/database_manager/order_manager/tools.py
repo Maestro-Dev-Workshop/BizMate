@@ -2,7 +2,7 @@ import sys
 import os
 import datetime
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-from database_manager.supply_manager.tools import *
+from main.database_manager.supply_manager.tools import *
 from main.utils.db_utils import *
 def get_supplier_id_by_name(business_id:str,
                 name: str) -> int:
