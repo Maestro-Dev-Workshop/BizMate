@@ -48,7 +48,7 @@ CREATE TABLE customer (
 
 -- Table: customer_orders
 CREATE TABLE customer_order (
-    id INTEGER PRIMARY KEY,
+    id INTEGER AUTO_INCREMENT PRIMARY KEY,
     customer_id VARCHAR(255) NOT NULL,
     product_id INTEGER NOT NULL,
     business_id VARCHAR(255) NOT NULL,

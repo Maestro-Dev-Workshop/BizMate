@@ -5,23 +5,14 @@ import os
 
 
 def get_business_details(
-        username: str
+        business_id: str
 ):
-    """
-    Specialized Bizmate Agent Tool.
-    Get details of a business.
-
-    Args:
-        username (str): the telegram username of the business.
-    Returns:
-        A dictionary containing details of the business, with keys: id, username, name, age, gender, contact_details.
-    """
 
     cols = ["id","username", "name", "business_name"]
     result = get_rows_with_exact_column_values(
         "business", 
-        ["username"], 
-        [username], 
+        ["id"], 
+        [business_id], 
         cols)
     
     if isinstance(result, str):
@@ -57,7 +48,7 @@ get_business_details.__doc__ = """
 Gets business details
 
 Args:
-username(str): Telegram username
+id : Business id
 
 Returns :
 Whether it exists

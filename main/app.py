@@ -14,10 +14,10 @@ class BotManager:
         self.session_service = session_service
         self.cs_tokens = self.get_cs_bot_token()
         self.bizmate_bot = BizMateBot(session_service)
-        self.customer_service_bots = [
-            CustomerServiceBot(session_service=session_service, token=token, business_id=id)
-            for id, token in self.cs_tokens if token != ""
-        ]
+        self.customer_service_bots = []
+        for id, token in self.cs_tokens:
+            if (token != "") and isinstance(token, str):
+                self.customer_service_bots.append(CustomerServiceBot(session_service=session_service, token=token, business_id=id))
         self.all_bot = [self.bizmate_bot] + self.customer_service_bots
     
     async def start_bot(self, bot):

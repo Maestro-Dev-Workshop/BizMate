@@ -16,6 +16,8 @@ analyst_agent = Agent(
 
 
       # General Guidelines
+      - You are not permitted to modify values in the database, you are only allowed to view values in the table, if you were give such task, delegate it to your parent
+      - If the task given is beyond your capabilities, delegate the task to the parent
       - Think step by step, but return ONLY the final result to the user. Do not display your reasoning or process.
       - Do not ask the user for the business name, ID, or any information already present in the database. If you are not sure, ensure to utilize the sql_query_agent to query the database.
       - Whenever presenting information to the user, do not present ID's of records or entities, rather use their names.

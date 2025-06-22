@@ -3,7 +3,7 @@ import os
 from google.adk.tools import ToolContext
 from main.utils.db_utils import (cursor,get_rows_with_matching_column_values,
                                 get_rows_with_exact_column_values, insert,list_tables,describe_table,
-                                execute_query,get_single_value,params_format)
+                                execute_query,get_single_value,params_format,serialize_dict)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import datetime
 
@@ -149,7 +149,7 @@ def upload_customer_details(
     cols = ["id","username", "name", "age", "gender", "contact_details"]
     cols = f"({', '.join(cols)})"
     values = (id,username, name, age, gender, contact_details)
-    values_fmt = "%s, %s, %s, %s, %s, %s, %s"
+    values_fmt = "%s, %s, %s, %s, %s, %s"
     result = insert(tbl_name, cols, values, values_fmt)
 
     cols = ["customer_id", "chat_id", "business_id"]
@@ -264,10 +264,10 @@ def get_customer_orders(
         customer_id (str): the id of the customer in the database.
         start_date (str): the date to filter from, in the format YYYY-mm-dd.
     Returns:
-        A list of dictionaries, each representing a customer visit, with keys: product_id, quantity_ordered, discount_factor, order_status, and date_ordered.
+        A list of dictionaries, each representing a customer visit, with keys: product_id, quantity_ordered, sold_price, order_status, and date_ordered.
     """
 
-    cols = ["product_id", "quantity_ordered", "discount_factor", "order_status", "date_ordered"]
+    cols = ["product_id", "quantity_ordered", "sold_price", "order_status", "date_ordered"]
     query = f"SELECT {', '.join(cols)} FROM customer_order WHERE business_id = %s AND customer_id = %s AND date_ordered >= %s"
     try:
         cursor.execute(query, (business_id, customer_id, start_date))
@@ -275,7 +275,7 @@ def get_customer_orders(
         orders = []
         for order in result:
             orders.append({cols[i]: order[i] for i in range(len(cols))})
-        return orders
+        return serialize_dict(orders)
     except Exception as e:
         return f"Error: {e}"
 
@@ -292,10 +292,10 @@ def get_all_customer_orders(
         business_id (str): the id of the business to search for (in string format).
         customer_id (str): the id of the customer in the database.
     Returns:
-        A list of dictionaries, each representing a customer's order, with keys: product_id, quantity_ordered, discount_factor, order_status, and date_ordered.
+        A list of dictionaries, each representing a customer's order, with keys: product_id, quantity_ordered, sold_price, order_status, and date_ordered.
     """
 
-    cols = ["product_id", "quantity_ordered", "discount_factor", "order_status", "date_ordered"]
+    cols = ["product_id", "quantity_ordered", "sold_price", "order_status", "date_ordered"]
     result = get_rows_with_exact_column_values(
         "customer_order", 
         ["business_id", "customer_id"], 
@@ -316,7 +316,7 @@ def upload_customer_order(
         customer_id: str,
         product_id: str,
         quantity_ordered: int,
-        discount_factor: float
+        sold_price: float
 ):
     """
     Specialized Customer Service Agent Tool.
@@ -327,19 +327,19 @@ def upload_customer_order(
         customer_id (str): the id of the customer in the database.
         product_id (str): the id of the product being ordered.
         quantity_ordered (int): the amount of the product to order.
-        discount_factor (float): the percentage of discount being applied to the order (ranging from 0.0 as no discount to 1.0 as 100% discount).
+        sold_price (float): The price of the item you sold.
     Returns:
         A response notifying whether or not record upload was successful.
     """
 
     tbl_name = "customer_order"
-    cols = ["customer_id", "business_id", "product_id", "quantity_ordered", "discount_factor", "order_status", "date_ordered"]
+    cols = ["customer_id", "business_id", "product_id", "quantity_ordered", "sold_price", "order_status", "date_ordered"]
     cols = f"({', '.join(cols)})"
     time_of_order = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    values = (customer_id, business_id, product_id, quantity_ordered, discount_factor, "pending", time_of_order)
-    values_fmt = "%s, %s, %s, %s, %s, %s"
+    values = (customer_id, business_id, product_id, quantity_ordered, sold_price, "pending", time_of_order)
+    values_fmt = "%s, %s, %s, %s, %s, %s, %s"
     result = insert(tbl_name, cols, values, values_fmt)
-    return result
+    return time_of_order
 
 
 upload_customer_details.__doc__ = f"""

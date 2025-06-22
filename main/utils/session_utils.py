@@ -71,11 +71,13 @@ async def call_agent_async(query: str, runner, user_id, session_id):
 async def call_agent_async_system(query: str, runner, user_id, session_id):
     # print(f"\n>>> User Query: {query}")
 
-    content = types.Content(role='system', parts=[types.Part(text=query)])
+    content = types.Content(role='model', parts=[types.Part(text=query)])
     final_response_text = ""
 
     async for event in runner.run_async(user_id=user_id, session_id=session_id, new_message=content):
-
+        print("System")
+        print(f"  [Event] Author: {event.author}, Type: {type(event).__name__}, Final: {event.is_final_response()}, Content: {event.content}")
+        print("\n\n")
         if event.is_final_response():
             if event.content and event.content.parts:
                 final_response_text = event.content.parts[0].text

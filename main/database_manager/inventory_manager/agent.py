@@ -2,7 +2,7 @@
 # Inform users any product low in stock
 # Updating the stock
 from google.adk.agents import Agent
-from database_manager.inventory_manager.tools import *
+from main.database_manager.inventory_manager.tools import *
  
 inventory_agent = Agent(
     name="inventory_manager",

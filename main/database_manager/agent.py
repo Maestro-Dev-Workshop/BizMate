@@ -50,7 +50,7 @@ orchestrator = Agent(
             - Think step by step, but only return the final result to the user—do not display your reasoning or process.
             - Always include both the business name and business ID when using inventory_manager, order_manager, and supply_manager tools.
             - Once the user provides the details, confirm with them that the information is correct before proceeding.
-            - If no appropriate tool exists for a task, delegate the task back to your parent.
+            - If any task given to you is beyond your capabilities, delegate the task to your parent agent (bizmate).
             - The inventory_manager, order_manager, and supply_manager tools can add, modify, delete, delete all, and list products, orders(either customer or supply), and supplier details, respectively.
             - the_registrar is responsible for account management from add, updating to deleting an account details
             - If you want to add, update, or delete multiple items, put all the parameters in a single request within the function call, do not make multiple requests for the same task
@@ -87,22 +87,22 @@ orchestrator = Agent(
                             - you will first call inventory_manager to decrease the quantity(action=decrease quantity in stock) of that item by **the amount**(i.e you're subtracting from the quantity)
                             - if inventory manager was successful,proceed to update the order status to confirmed.
                             - After that you'll need to alert the customer service agent, first get the contact name of the bot using get_contact_details
-                            - Draft the following message:
-                                Message from Bizmate,
-                                    The following order:
-                                        Customer Name
-                                        Customer ID
-                                        Product Name
-                                        Product Brand
-                                        Quantity
-                                        Date Ordered
-                                        Price per item
-                                        Total Amount per item (calculate it)
-                                        Overall Amount (calculate it)
-                                Has already been fulfilled/confirmed. You can rephrase the message, as long as it contains all the details
-                        get the Customer service agent bot contact details for that business id, then send the message for each order made, use the tool run
-                    Do not ask the user for permission to use tools
                     - You can also update the order status to `cancelled` or `rejected` for both supply and customer orders, but you must first get the order ID from the user, then call order_manager to update the order status to `cancelled` or `rejected` depending on the type of order
+                    - After updating the status of the customer order, perform the following:
+                        - Draft the following message:
+                            Message from Bizmate,
+                                The following order:
+                                    Customer Name
+                                    Customer ID(retrieve it from the order placed)
+                                    Product Name
+                                    Product Brand
+                                    Quantity
+                                    Date Ordered
+                                    Price per item
+                                    Total Amount per item (calculate it)
+                                    Overall Amount (calculate it)
+                                Has already been fulfilled/confirmed/declined. You can rephrase the message, as long as it contains all the details
+                            - get the Customer service agent bot contact details for that business id using get_contact_details, then send the message for each order made, use the tool run
                 - If the update doesn't meet the requirement of special update, just call order_manager providing it the necessary details, make sure you state the type of order(customer or supply)
 
 

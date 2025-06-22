@@ -10,3 +10,4 @@ cslogs
 rand.py
 /main/visuals/
 *.session
+*.pdf

@@ -1,8 +1,8 @@
 from telebot.async_telebot import AsyncTeleBot
-from bizmate.agent import bizmate
-from utils.session_utils import (
+from main.bizmate.agent import bizmate
+from main.utils.session_utils import (
     create_session,call_agent_async,get_session, call_agent_async_system, reset_session, create_runner, create_or_get_session)
-from utils.db_utils import cursor
+from main.utils.db_utils import cursor
 import datetime
 import os
 from dotenv import load_dotenv
@@ -50,6 +50,7 @@ class BizMateBot:
     def register_handlers(self):
         @self.bot.message_handler(commands=["hello", "start"])
         async def send_welcome_message(message):
+            
             await self.handle_welcome(message)
 
         @self.bot.message_handler(func=lambda message: True)
@@ -66,17 +67,18 @@ class BizMateBot:
             session_id
         )
         data = json.loads(response.strip().removeprefix('```json').removesuffix('```').strip())
-        chat_id = cursor.execute("""SELECT chat_id FROM business WHERE business_id = %s""", (data['business_id'])).fetchone()
-        self.bot.send_message(chat_id[0], data['message_to_owner'])
+        cursor.execute("""SELECT chat_id FROM business WHERE id = %s""", (data['business_id'],))
+        chat_id = cursor.fetchone()
+        await self.bot.send_message(chat_id[0], data['message_to_owner'])
         session_owner = await get_session(
                 APP_NAME,
-                user_id,
-                f"{user_id}_session",
+                data['business_id'],
+                f"ENT{data["business_id"]}_session",
                 self.session_service
             )
         
         runner.session = session_owner
-        await call_agent_async_system(data['sys_message'], runner, user_id, f"{chat_id}_session")
+        await call_agent_async_system(data['sys_message'], runner, data['business_id'], f"ENT{chat_id}_session")
 
     def create_folder(self, userid):
         fpath = Path("main", "visuals", userid)
@@ -91,6 +93,7 @@ class BizMateBot:
         chat_id = message.chat.id
         session_id = f"ENT{user_id}_session"
         self.create_folder(user_id)
+        await self.bot.send_chat_action(chat_id, action='typing')
         try:
             session = await create_session(APP_NAME, user_id, session_id, self.session_service,state={"chat_id": chat_id})
             
@@ -129,6 +132,7 @@ class BizMateBot:
         self.create_folder(user_id)
         user_prompt = f"{display_name}: {message.text}\n"
         chat_id = message.chat.id
+        await self.bot.send_chat_action(chat_id, action='typing')
 
         if username == COMM:
             session = await create_or_get_session(APP_NAME, user_id, f"ENT{user_id}_session", self.session_service)
