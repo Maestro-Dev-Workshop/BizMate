@@ -1,8 +1,10 @@
 import sys
 import os
-
+from google.adk.tools import ToolContext
+from main.utils.db_utils import (cursor,get_rows_with_matching_column_values,
+                                get_rows_with_exact_column_values, insert,list_tables,describe_table,
+                                execute_query,get_single_value,params_format)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from database_manager.tools import *
 import datetime
 
 
@@ -66,18 +68,6 @@ def get_specific_product_info(
         product_id: str,
         product_name: str,
 ):
-    """
-    Specialized Customer Service Agent Tool.
-    Get details of a specific product by searching, either by the product's id, or the name provided.
-
-    Args:
-        business_id (str): the id of the business to search for (in string format).
-        (optional) product_id (str): the id of the product to search for. You can choose to pass an empty string for this parameter if no value is available.
-        (optional) product_name (str): the name of the product. You can choose to pass an empty string for this parameter if no value is available.
-        Note: Either the product_id or product_name must be provided, both cannot be empty.
-    Returns:
-        A list of dictionaries, each representing a product with matching name/id, with keys: id, item_name, category, brand, quantity_in_stock, selling_price, and minimum_selling_price.
-    """
 
     cols = ["id", "item_name", "category", "brand", "quantity_in_stock", "selling_price", "minimum_selling_price"]
 
@@ -116,7 +106,7 @@ def get_specific_product_info(
 
 
 def get_customer_details(
-        username: str
+        id: str
 ):
     """
     Specialized Customer Service Agent Tool.
@@ -131,8 +121,8 @@ def get_customer_details(
     cols = ["id","username", "name", "age", "gender", "contact_details"]
     result = get_rows_with_exact_column_values(
         "customer", 
-        ["username"], 
-        [username], 
+        ["id"], 
+        [id], 
         cols)
     
     if isinstance(result, str):
@@ -145,31 +135,28 @@ def get_customer_details(
 
 
 def upload_customer_details(
+        id : str,
+        business_id: str,
         username: str,
         name: str,
         age: int,
         gender: str,
         contact_details: str,
+        tool_context: ToolContext
 ):
-    """
-    Specialized Customer Service Agent Tool.
-    Uploads details of a customer to the database
-
-    Args:
-        username (str): the telegram username of the customer.
-        name (str): the name of the customer.
-        age (int): the age of the customer.
-        gender (str): the gender of the customer (as M for male or F for female).
-        contact_details (str): the phone number or other contact detail of the customer.
-    Return:
-        A response notifying whether or not record upload was successful
-    """
     tbl_name = "customer"
-    cols = ["username", "name", "age", "gender", "contact_details"]
+    chat_id = tool_context.state.get("chat_id", None)
+    cols = ["id","username", "name", "age", "gender", "contact_details"]
     cols = f"({', '.join(cols)})"
-    values = (username, name, age, gender, contact_details)
-    values_fmt = "%s, %s, %s, %s, %s"
+    values = (id,username, name, age, gender, contact_details)
+    values_fmt = "%s, %s, %s, %s, %s, %s, %s"
     result = insert(tbl_name, cols, values, values_fmt)
+
+    cols = ["customer_id", "chat_id", "business_id"]
+    cols = f"({', '.join(cols)})"
+    values = (id, chat_id, business_id)
+    values_fmt = "%s, %s, %s"
+    insert("chat", cols, values, values_fmt)
     return result
 
 
@@ -339,7 +326,7 @@ def upload_customer_order(
         business_id (str): the id of the business to search for (in string format).
         customer_id (str): the id of the customer in the database.
         product_id (str): the id of the product being ordered.
-        quantity_ordered (int): the amout of the product to order.
+        quantity_ordered (int): the amount of the product to order.
         discount_factor (float): the percentage of discount being applied to the order (ranging from 0.0 as no discount to 1.0 as 100% discount).
     Returns:
         A response notifying whether or not record upload was successful.
@@ -355,10 +342,37 @@ def upload_customer_order(
     return result
 
 
-if __name__ == "__main__":
-    print(get_business_info("1"))
-    # print(type(get_business_info("1")["date_joined"]))
-    # print(type(get_products_info("1")))
-    # print(get_specific_product_info("1", product_name="Toothbrush"))
-    # print(get_specific_product_info("1", product_id="3"))
-    pass
+upload_customer_details.__doc__ = f"""
+    Specialized Customer Service Agent Tool.
+    Uploads details of a customer to the database
+
+    The value of the `name` must be formatted in the following way:
+    {params_format()}
+
+    Args:
+        id (str): the id of the customer
+        business_id (str): the id of the business to which the customer belongs.
+        username (str): the telegram username of the customer.
+        name (str): the name of the customer.
+        age (int): the age of the customer.
+        gender (str): the gender of the customer (as M for male or F for female).
+        contact_details (str): the phone number or other contact detail of the customer.
+    Return:
+        A response notifying whether or not record upload was successful
+    """
+
+get_specific_product_info.__doc__ = f"""
+    Specialized Customer Service Agent Tool.
+    Get details of a specific product by searching, either by the product's id, or the name provided.
+
+    The value of the product parameter must be formatted in the following way:
+          {params_format()}
+
+    Args:
+        business_id (str): the id of the business to search for (in string format).
+        (optional) product_id (str): the id of the product to search for. You can choose to pass an empty string for this parameter if no value is available.
+        (optional) product_name (str): the name of the product. You can choose to pass an empty string for this parameter if no value is available.
+        Note: Either the product_id or product_name must be provided, both cannot be empty.
+    Returns:
+        A list of dictionaries, each representing a product with matching name/id, with keys: id, item_name, category, brand, quantity_in_stock, selling_price, and minimum_selling_price.
+    """

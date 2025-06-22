@@ -1,9 +1,6 @@
-import asyncio
 from google.adk.agents import Agent
-from google.adk.sessions import InMemorySessionService
-from google.adk.runners import Runner
-from google.genai import types
-from tools import *
+from customer_service.tools import *
+from utils.tg_utils import run
 
 customer_service_agent = Agent(
     name="customer_service_agent",
@@ -11,6 +8,8 @@ customer_service_agent = Agent(
     description=("Agent that manages customer interactions for Small to Medium enterprises(SMEs)"),
     instruction="""
         You are a customer service agent. Your job is to help customers in answering any questions about a specific business, aid in booking and tracking orders, and managing customer relationships in general.
+        Do not treat the user as customer if the business id and customer id are the same, instead only respond with:
+            `Nice try **customer_username** but you cannot make an order for yourself. Return to Bizmate`
 
         Your primary functions include:
         1. Acting as a chatbot for the business to the customer
@@ -22,24 +21,61 @@ customer_service_agent = Agent(
         7. Log customer visits to the business (i.e interactions with the bot)
 
         Be sure to use tools marked as "Specialized Customer Service Agent Tool" before considering using other general purpose tools.
-
         # Chatbot services
         ## Instruction
         When acting as a chatbot and answering customer questions about a business, you will be provided with basic information about the business and its products/services. The price of all the products is in Naira.
         Make sure that any information you give the customer about the business must be factual (come from the knowledge base).
         Do not give the customer any information about the business that is not provided in the knowledge base.
         Also, do not tell the customer about the product's "minimum_selling_price" unless he/she asks for a discount when ordering.
-        If the customer's telegram username is unavailable, be sure to ask for it immediately, otherwise use the provided telegram username to search for the customer in the database.
+        If the customer's telegram username is unavailable, be sure to ask for it immediately, otherwise use the provided telegram id to search for the customer in the database.
         Only ask for other customer details when they're making an order, provided the database doesn't already posses those details.
         Only give general information about the business and its products, details of the customer's own visits, and details of the customer's own orders. Do not give the customer any other information.
-        
+        When responding to a customer, ensure you format the following details name, product name, product brand, business name:
+            - Replace any underscores(_) between words with spaces.
+            - Capitalize the first letter of each word.
+        - For example, `product_name` should be formatted as `Product Name`        
         # Ordering system
         ## Instruction
-        When making an order for a customer for the first time, ensure to collect the necessay details of a customer including name, age, and gender, and upload it to the database.
+        When making an order for a customer for the first time, ensure to collect the necessary details of a customer including name, age, and gender, and upload it to the database.
         Details of the order should also be collected, including the product and quantity to purchase.
         If the customer attempts to bargain or request for a discount, you can also try to bargain, whilst keeping in mind the value of the product's "minimum_selling_price"
         When details of the customer and order have been collected, present the details of the order and the summary of the total cost to the customer before asking for confirmation.
-        When the order is confirmed upload the necassary details of the order to the database.
+        When the order is confirmed upload the necessary details of the order to the database then draft a message
+          Here's a draft of what the message should contain:
+        'Message from **business name** Customer Service agent with **business_id**:
+            **customer_username**(**customer_id**) bought the following
+                - **quantity** **product_name** (**product_brand**)for **amount_sold**
+            Total price charged : **total_amount** on the **date ordered**
+        '
+        you can the rephrase the message anyhow you want to but it must include the necessary details, then send the message using run(contact = bizmate_agent_bot)
+        Output
+        ##
+        Alerting Users:
+            You must alert users only if you receive a message(Role System)
+            From the message received, extract the following
+            - Customer ID
+            - Customer Username
+            - Quantity
+            - Order ID
+            - Product name
+            - Product brand
+            - Date Ordered
+            - Total Amount
+            - order status
+
+            Then draft the following message:
+            `Dear **customer_username** your order **the details** has been `status`. Thank you for patronizing with business_name`.
+            Also draft a message stating `**the order details** for **customer** has already been `ordered status` and I have already sent it to the user`
+
+            Your output  should be in json format, here's the schema:
+            {
+            "customer_id": "example_id",
+            "customer_message": "example customer message",
+            "sys_message": "example system message"
+            }
+            Do not return anything else
+
+
 
         # Customer history services
         ## Instruction
@@ -53,88 +89,6 @@ customer_service_agent = Agent(
         get_customer_visits, get_all_customer_visits, log_customer_visit,   # Customer visit tools
         get_customer_orders, get_all_customer_orders, upload_customer_order,    # Customer order tools
         list_tables, describe_table, execute_query, get_single_value, get_rows_with_exact_column_values, get_rows_with_matching_column_values,  # General tools
+        run
     ]
 )
-
-
-async def create_session(app_name, user_id, session_id, session_service):
-    session = await session_service.create_session(
-        app_name=app_name,
-        user_id=user_id,
-        session_id=session_id,
-    )
-    print(f"Session created: APP_NAME={app_name}, USER_ID={user_id}, SESSION_ID={session_id}")
-
-    return session
-
-async def get_session(app_name, user_id, session_id, session_service):
-    session = await session_service.get_session(
-        app_name=app_name,
-        user_id=user_id,
-        session_id=session_id
-    )
-
-    return session
-
-def create_runner(app_name, session_service):
-    runner = Runner(
-        agent=customer_service_agent,
-        app_name=app_name,
-        session_service=session_service
-    )
-
-    return runner
-
-async def call_agent_async(query: str, runner, user_id, session_id):
-    # print(f"\n>>> User Query: {query}")
-
-    content = types.Content(role='user', parts=[types.Part(text=query)])
-    final_response_text = "Agent did not produce a final response."
-
-    async for event in runner.run_async(user_id=user_id, session_id=session_id, new_message=content):
-        # print(f"  [Event] Author: {event.author}, Type: {type(event).__name__}, Final: {event.is_final_response()}, Content: {event.content}")
-
-        if event.is_final_response():
-            if event.content and event.content.parts:
-                final_response_text = event.content.parts[0].text
-            elif event.actions and event.actions.escalate:
-                final_response_text = f"Agent escalated: {event.error_message or 'No specific message.'}"
-            break
-
-    return final_response_text
-
-async def main():
-    APP_NAME = "bizmate_test_app"
-    USER_ID = "user_1"
-    SESSION_ID = "session_001"
-
-    session_service = InMemorySessionService()
-    session = await create_session(APP_NAME, USER_ID, SESSION_ID, session_service)
-    runner = create_runner(APP_NAME, session_service)
-
-    async def run_conversation():
-        business_id = "1"
-        customer_username = "blaze"
-        initial_prompt = f"""
-            This is a message from the business admin.
-            The id of the business in the database is {business_id}. Use your tools to extract basic information about the business and its products.
-            Ensure to greet the customer and provide a very brief description of the business, including the name and services offered.
-            The telegram username of the customer you're currently serving is {customer_username}. Confirm if the customer already exists in the database before interacting.
-            From now on you will be engaging with the customer.
-        """
-        initial_response = await call_agent_async(initial_prompt, runner, USER_ID, SESSION_ID)
-        print(f">>> Agent: {initial_response}")
-
-        running = True
-        while running:
-            user_query = input(">>> User: ")
-            if user_query == "q":
-                running = False
-            else:
-                response = await call_agent_async(user_query, runner, USER_ID, SESSION_ID)
-                print(f">>> Agent: {response}")
-    
-    await run_conversation()
-
-if __name__ == "__main__":
-    asyncio.run(main())

@@ -1,23 +1,31 @@
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-from database_manager.tools import *
+from main.utils.db_utils import *
+from google.adk.tools import ToolContext
 import datetime
 
 
 def add_business(
+        id : str,
+        username : str,
         name : str,
         business_name : str,
         brief_description : str,
         contact_details : str,
         physical_address: str,
         dob:str,
-        password:str) -> str:
+        bot_token: str,
+        bot_username: str,
+        bot_link: str,
+        tool_context: ToolContext) -> str:
     dob = datetime.datetime.strptime(dob,"%Y-%m-%d").date()
     date_joined = datetime.date.today()
-    values = (name, business_name, brief_description, date_joined, contact_details,physical_address,dob,password,True)
-    fmt = "%s, %s, %s, %s, %s, %s, %s, %s, %s"
-    columns = "(username, business_name, brief_description, date_joined, contact_details, physical_address, date_of_birth, password, active)"
+    chat_id = tool_context.state.get("chat_id", None)
+    values = (id, username, name, business_name, brief_description, date_joined, contact_details,physical_address,dob,True,bot_username, bot_link, bot_token,chat_id)
+    fmt = "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s"
+    # print(len(fmt.split(", ")))
+    columns = "(id, username, name, business_name, brief_description, date_joined, contact_details, physical_address, date_of_birth, active, tg_bot_username, tg_bot_link, tg_bot_token, chat_id)"
     return insert("business", columns, values, fmt)
 
 add_business.__doc__ = f"""
@@ -27,13 +35,17 @@ The values of `name` and `business_name` must be formatted as follows:
 {params_format()}
 
 Args:
+    id(str) : The business id
+    Username (str) : Username of the business admin
     name (str): Name of the business owner.
     business_name (str): Name of the business.
     brief_description (str): Brief description of the business.
     contact_details (str): Email or phone number of the business.
     physical_address (str): The physical location of the business.
     dob (str): Date of birth in YYYY-MM-DD format.
-    password (str): Login password.
+    bot_token (str): Bot token for the created bot.
+    bot_username (str): Bot Username
+    bot_link (str): Bot link
 
 Returns:
     str: Message indicating if the insertion was successful.

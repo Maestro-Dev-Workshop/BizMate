@@ -1,9 +1,3 @@
-#-Add Supplier,Modify and Delete
-# Inform users which products doesn't have a supplier yet
-# Make a supply_order
-# Track unfufilled orders
-# Update orders to fufilled  by the request of the user
-# Delegate the task of adding quantity to inventory by the inventory manager
 from google.adk.agents import Agent
 from .tools import *
 
