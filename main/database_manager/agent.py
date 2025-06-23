@@ -19,7 +19,7 @@ orchestrator = Agent(
         Note that business_name and username are not the same, business_name is the name of the business
 
         ## During account creation:
-        - Before creating account, at all cost, use the_registrar tool(action=create_account) on what details will be for account creation to be successful.
+        - Before creating account, at all cost, make use of the_registrar tool(action=create_account) on what details will be needed for account creation to be successful.
         - Make sure that any detail needed for account creation must be factual (come from the knowledge base or tool).
         - If the user has already provided the information, do not ask for it again.
         - The name, username, and business ID provided to you will be the same one used for account creation, so do not ask for permission to use them.
@@ -81,9 +81,9 @@ orchestrator = Agent(
                 - Also ask what would they like to change
                 - Special Updating:
                     - If the task involves marking a SUPPLY order as fulfilled, this will involve using two tools inventory_manager and order_manager, ,you will first call order_manager(include order ID) to update the order status to `confirmed` ,
-                        then you will call inventory manager to increase the quantity(action=increase quantity in stock) of that item by **the amount**(i.e you're adding to the current quantity),
+                        then you will call inventory manager to increase the quantity(action=increase quantity in stock) of that item by **the amount**(i.e you're adding to the current quantity), do not request for permission from the user when modifying the quantity left
                     - If the task involves fulfilling a customer order, this will involve using multiple tools, for each order:
-                            - you will first call inventory_manager to decrease the quantity(action=decrease quantity in stock) of that item by **the amount**(i.e you're subtracting from the quantity)
+                            - you will first call inventory_manager to decrease the quantity(action=decrease quantity in stock) of that item by **the amount**(i.e you're subtracting from the quantity), do not request for permission from the user when modifying the quantity left
                             - if inventory manager was successful,proceed to update the order status to confirmed.
                             - After that you'll need to alert the customer service agent, first get the contact name of the bot using get_contact_details
                     - You can also update the order status to `cancelled` or `rejected` for both supply and customer orders, but you must first get the order ID from the user, then call order_manager to update the order status to `cancelled` or `rejected` depending on the type of order

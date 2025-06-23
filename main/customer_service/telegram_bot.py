@@ -65,7 +65,6 @@ class CustomerServiceBot:
         data = json.loads(response.strip().removeprefix('```json').removesuffix('```').strip())
         chat_id = cursor.execute("""SELECT chat_id FROM chat WHERE customer_id = %s AND business_id = %s""", (data['customer_id'], self.business_id))
         chat_id = cursor.fetchone()
-        print(data["customer_id"],chat_id[0])
         await self.bot.send_message(chat_id[0], data['customer_message'])
         session_customer = await get_session(
                 APP_NAME,
@@ -159,9 +158,7 @@ class CustomerServiceBot:
             chat_id = message.chat.id
             await self.send_act(chat_id, action='typing')
             if username == COMM:
-                print(session)
                 session = await create_or_get_session(APP_NAME, user_id, f"{chat_id}_session", self.session_service, state={"chat_id": chat_id})
-                print("w")
                 runner = create_runner(
                     APP_NAME,
                     self.session_service,

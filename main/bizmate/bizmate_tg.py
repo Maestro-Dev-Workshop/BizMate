@@ -85,7 +85,7 @@ class BizMateBot:
             )
         
         runner.session = session_owner
-        await call_agent_async_system(data['sys_message'], runner, data['business_id'], f"ENT{chat_id}_session")
+        await call_agent_async_system(data['system_message'], runner, data['business_id'], f"ENT{chat_id[0]}_session")
 
     def create_folder(self, userid):
         fpath = Path("main", "visuals", userid)
@@ -144,6 +144,7 @@ class BizMateBot:
         if username == COMM:
             print(user_id)
             session = await create_or_get_session(APP_NAME, user_id, f"ENT{user_id}_session", self.session_service)
+            print(session.id)
             print("w")
             runner = create_runner(
                 APP_NAME,

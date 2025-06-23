@@ -89,9 +89,13 @@ async def call_agent_async_system(query: str, runner, user_id, session_id):
 
 async def create_or_get_session(app_name, user_id, session_id, session_service, **kwargs):
     try:
-        return await get_session(app_name, user_id, session_id, session_service)
+        x = await get_session(app_name, user_id, session_id, session_service)
     except Exception as e:
         return await create_session(app_name, user_id, session_id, session_service, **kwargs)
+    if not x:
+        return await create_session(app_name, user_id, session_id, session_service, **kwargs)
+    return x
+    
 
 
 
