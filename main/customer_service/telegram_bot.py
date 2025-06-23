@@ -159,7 +159,9 @@ class CustomerServiceBot:
             chat_id = message.chat.id
             await self.send_act(chat_id, action='typing')
             if username == COMM:
+                print(session)
                 session = await create_or_get_session(APP_NAME, user_id, f"{chat_id}_session", self.session_service, state={"chat_id": chat_id})
+                print("w")
                 runner = create_runner(
                     APP_NAME,
                     self.session_service,
@@ -200,7 +202,7 @@ class CustomerServiceBot:
                 )
                 agent_welcome_back_message = f"Agent: {welcome_back_message}\n"
                 print(agent_welcome_back_message)
-                log(display_name,'',welcome_back_message)
+                log(display_name,'',agent_response)
                 await self.bot.send_message(message.chat.id, welcome_back_message )
                 return
             print("wdw")

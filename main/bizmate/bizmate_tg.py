@@ -72,6 +72,7 @@ class BizMateBot:
             user_id,
             session_id
         )
+        print("why")
         data = json.loads(response.strip().removeprefix('```json').removesuffix('```').strip())
         cursor.execute("""SELECT chat_id FROM business WHERE id = %s""", (data['business_id'],))
         chat_id = cursor.fetchone()
@@ -141,12 +142,15 @@ class BizMateBot:
         await self.send_act(chat_id, action='typing')
 
         if username == COMM:
+            print(user_id)
             session = await create_or_get_session(APP_NAME, user_id, f"ENT{user_id}_session", self.session_service)
+            print("w")
             runner = create_runner(
                 APP_NAME,
                 self.session_service,
                 self.bizmate
             )
+            print("z")
             await self.send_alert(message.text, runner, user_id, f"ENT{user_id}_session")
             return
 
