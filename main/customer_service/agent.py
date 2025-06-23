@@ -48,7 +48,7 @@ customer_service_agent = Agent(
         ## Placing Orders
         When the order is confirmed upload the necessary details of the order to the database then draft a message
           Here's a draft of what the message should contain:
-        'Message from __business_name__ Customer Service agent with __business_id__:
+        'Message from __business_name__ Customer Service agent with business id __business_id__:
             __customer_username__(__customer_id__) bought the following
                 - __quantity__ __product_name__ (__product_brand__)for __amount_sold__
             Total price charged : __total_amount__ on the __date ordered__

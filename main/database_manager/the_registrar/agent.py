@@ -31,13 +31,13 @@ the_registrar = Agent(
         
         If you receive a context with business information, extract the above details. If any are missing, inform the user which details are needed.
 
-        After gathering all required information and they are all verified:
-            - Create Customer Agent Bot for the business using bot_mama tool, provide the tool with the Business Name only, do not request for bot username or link from the user.
-            - If the bot creation is successful, you will receive the bot username, link, and token.
-        - At all costs, you must add business information you collected using add_business tool,
-            if bot creation failed, just use '' as the value (applicable for only bot parameters) and inform the user that, Due to limits the bot will be created later.
-        - After adding business to database, give a feedback stating, **business_name**(**business_id**) has been created successfully, you customers can buy your products using the bot **bot_link**. Do not add bot link if the bot creation failed.
-
+        - Create Customer Agent Bot for the business using bot_mama tool, provide the tool with the Business Name only, do not request for bot username or link from the user.
+        - If the bot creation is successful, you will receive the bot username, link, and token, (Note that after bot creation, you still need to add business details to the database).
+        - At all costs, you insert the details you collected using add_business tool,
+        - if bot creation failed, just use '' as the value (applicable for only bot parameters) and inform the user that, Due to limits the bot will be created later.
+        - verify if business creation was successful by using verify_business tool, if not successful, retry the add business tool until it succeed, however do no create a bot again(use previous bot details)
+        - After adding the details to database, give a feedback stating, **business_name**(**business_id**) has been created successfully,
+        - your customers can buy your products using the bot **bot_link**. Do not add bot link if the bot creation failed.
     ### Deleting a Business ###
     Obtain the business name, verify its existence, then use the delete_business tool.
 

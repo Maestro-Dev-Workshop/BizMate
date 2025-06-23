@@ -64,7 +64,7 @@ class BizMateBot:
             await self.handle_reply(message)
 
     async def send_alert(self, msg ,runner, user_id, session_id):
-        prompt = f"""Return the json format a specified on the instruction the message 
+        prompt = f"""Return the json format a specified on the instruction the message on sales notification
         {msg} """
         author ,response = await call_agent_async(
             prompt,
@@ -72,10 +72,12 @@ class BizMateBot:
             user_id,
             session_id
         )
-        print("why")
+        # print(response)
         data = json.loads(response.strip().removeprefix('```json').removesuffix('```').strip())
+        print(data)
         cursor.execute("""SELECT chat_id FROM business WHERE id = %s""", (data['business_id'],))
         chat_id = cursor.fetchone()
+        print(chat_id)
         await self.bot.send_message(chat_id[0], data['message_to_owner'])
         session_owner = await get_session(
                 APP_NAME,
@@ -99,6 +101,8 @@ class BizMateBot:
         display_name = username if username else name or "<not-available>"
         chat_id = message.chat.id
         session_id = f"ENT{user_id}_session"
+        if username == COMM:
+            return
         self.create_folder(user_id)
         await self.send_act(chat_id, action='typing')
         try:
@@ -134,6 +138,7 @@ class BizMateBot:
 
     async def handle_reply(self, message):
         user_id = str(message.from_user.id)
+        print(user_id)
         username, name = self.get_usernames(message.from_user)
         display_name = username if username else name or "<not-available>"
         self.create_folder(user_id)

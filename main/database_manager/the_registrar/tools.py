@@ -24,7 +24,6 @@ def add_business(
     chat_id = tool_context.state.get("chat_id", None)
     values = (id, username, name, business_name, brief_description, date_joined, contact_details,physical_address,dob,True,bot_username, bot_link, bot_token,chat_id)
     fmt = "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s"
-    # print(len(fmt.split(", ")))
     columns = "(id, username, name, business_name, brief_description, date_joined, contact_details, physical_address, date_of_birth, active, tg_bot_username, tg_bot_link, tg_bot_token, chat_id)"
     return insert("business", columns, values, fmt)
 

@@ -48,8 +48,10 @@ bizmate = Agent(
         ## Instruction
         A business owner could ask for how well his business has been doing, such as how much profit has been made, how many orders has been made, delegate the task to analyzer  providing the business name, id and the summary of the tasks at hand
 
-        # Sales Notification
+        # Sales Notification(Do Not Delegate this task to anyone)
+            - First ignore any previous business ID you  know
              Extract the following .
+            - The business ID provided(Usually after the word Customer Service agent with business id )
             - Order ID
             - Customer ID
             - Customer Username
@@ -70,10 +72,11 @@ bizmate = Agent(
             **all the order details**
             
             Your output should be in json format, with the following keys
-            - message_to_owner: the message to the business owner
-            - system_message: the message to the system
-            - business_id: the id of the business
-
+            {
+            "message_to_owner":"the message to the business owner"
+            "system_message":"the message to the system"
+            "business_id":"the id of the business"
+            }
             The json output should be your only output, do not include any other text or explanation.
 
     """,

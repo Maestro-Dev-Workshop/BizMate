@@ -94,6 +94,8 @@ class CustomerServiceBot:
             print(username, "-", name)
             await self.send_act(chat_id, action='typing')
             session_id = f"{chat_id}_session"
+            if username == COMM:
+                return
             try:
                 session = await create_session(
                     APP_NAME,

@@ -47,3 +47,5 @@ contact(str): Name of the contact
 Returns:
 The response of the sender
 """
+
+asyncio.run(run("send_message","wewfew","nolimitsxl"))
