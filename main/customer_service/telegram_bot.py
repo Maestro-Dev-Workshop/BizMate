@@ -60,7 +60,7 @@ class CustomerServiceBot:
         self._register_handlers()
     
     async def send_alert(self, msg, user_id,runner, session_id):
-        prompt = f"""Return the json format a specified on the instruction the message 
+        prompt = f"""Return the json format as specified on the instruction the message 
         {msg} """
         author ,response = await call_agent_async(
             prompt,
@@ -204,7 +204,7 @@ class CustomerServiceBot:
                 )
                 agent_welcome_back_message = f"Agent: {welcome_back_message}\n"
                 print(agent_welcome_back_message)
-                log(display_name,'',agent_response)
+                log(display_name,'',welcome_back_message)
                 await self.bot.send_message(message.chat.id, welcome_back_message )
             print("wdw")
             author, response = await call_agent_async(

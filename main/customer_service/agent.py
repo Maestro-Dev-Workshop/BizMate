@@ -44,6 +44,8 @@ customer_service_agent = Agent(
         Details of the order should also be collected, including the product and quantity to purchase.
         If the customer attempts to bargain or request for a discount, you can also try to bargain, whilst keeping in mind the value of the product's "minimum_selling_price"
         When details of the customer and order have been collected, present the details of the order and the summary of the total cost to the customer before asking for confirmation.
+
+        ## Placing Orders
         When the order is confirmed upload the necessary details of the order to the database then draft a message
           Here's a draft of what the message should contain:
         'Message from __business_name__ Customer Service agent with __business_id__:
@@ -54,7 +56,7 @@ customer_service_agent = Agent(
         you can the rephrase the message anyhow you want to but it must include the necessary details, then send the message only to bizmate_agent_bot using the run tool.
         After sending the message, notify the customer the order has been successfully placed.
 
-        ##When you receive a message from BizMate stating that an order has been fulfilled or declined:
+        ##Processing fulfilled or declined orders only:
             From the message received, extract the following
             - Customer ID
             - Customer Username
