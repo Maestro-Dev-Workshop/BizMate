@@ -45,6 +45,12 @@ class BizMateBot:
         lastname = user.last_name or ""
         name = (firstname + " " + lastname).strip()
         return username, name
+    
+    async def send_act(self,chat_id,action):
+        try:
+            await self.bot.send_chat_action(chat_id, action=action, request_timeout=10)
+        except Exception as e:
+            return
 
 
     def register_handlers(self):
@@ -93,7 +99,7 @@ class BizMateBot:
         chat_id = message.chat.id
         session_id = f"ENT{user_id}_session"
         self.create_folder(user_id)
-        await self.bot.send_chat_action(chat_id, action='typing')
+        await self.send_act(chat_id, action='typing')
         try:
             session = await create_session(APP_NAME, user_id, session_id, self.session_service,state={"chat_id": chat_id})
             
@@ -132,7 +138,7 @@ class BizMateBot:
         self.create_folder(user_id)
         user_prompt = f"{display_name}: {message.text}\n"
         chat_id = message.chat.id
-        await self.bot.send_chat_action(chat_id, action='typing')
+        await self.send_act(chat_id, action='typing')
 
         if username == COMM:
             session = await create_or_get_session(APP_NAME, user_id, f"ENT{user_id}_session", self.session_service)
@@ -163,7 +169,8 @@ class BizMateBot:
             agent_welcome_back_message = f"Agent: {welcome_back_message}\n"
             print(agent_welcome_back_message)
 
-            await self.bot.send_message(message.chat.id, welcome_back_message)
+            await self.bot.send_message(message.chat.id, welcome_back_message,timeout=600)
+            return
 
         author ,response = await call_agent_async(message.text, runner, user_id, session_id)
         agent_response = f"{author}: {response}\n"
@@ -176,7 +183,7 @@ class BizMateBot:
                 await self.bot.send_photo(message.chat.id, img, img_name.name)
             img_name.unlink() 
 
-        await self.bot.send_message(message.chat.id, response)
+        await self.bot.send_message(message.chat.id, response,timeout=600)
 
     async def run(self):
         print("Running bot...")

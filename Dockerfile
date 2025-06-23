@@ -15,3 +15,5 @@ COPY . .
 
 # Run your app
 CMD ["python", "-m", "main.app"]
+
+EXPOSE 8080

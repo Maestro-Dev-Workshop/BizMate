@@ -26,17 +26,14 @@ class BotManager:
     async def add_bot(self):
         while True:
             db.commit()
-            print("Checking for new customer service bots...")
             cursor.execute("SELECT id,tg_bot_token FROM business")
             new_bots = cursor.fetchall()
-            print("New bots found:", new_bots)
             N_BOTS = len(self.cs_tokens) - 1
             for id, token in new_bots[N_BOTS:]:
                 if token == "":
                     continue
                 if (id, token) in self.cs_tokens:
                     continue
-                print("Adding new bot with ID:", id, "and token:", token)
                 new_bot = CustomerServiceBot(session_service=self.session_service, token=token, business_id=id)
                 self.cs_tokens.append((id, token))
                 asyncio.create_task(self.start_bot(new_bot))

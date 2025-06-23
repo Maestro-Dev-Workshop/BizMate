@@ -9,7 +9,7 @@ load_dotenv()
 USER = os.environ["USER"]
 PASSWORD = os.environ["PASSWORD"]
 
-IP = '34.135.212.39'
+IP = '34.58.216.190'
 
 hosted = {
     "host":IP,

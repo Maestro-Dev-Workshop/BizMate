@@ -2,7 +2,7 @@ from google.adk.agents import Agent
 from main.data_analyst.data_visualizer.tools import *
 
 data_visualization_agent = Agent(
-    model="gemini-2.0-flash",
+    model="gemini-2.0-pro",
     name="data_visualization_agent",
     instruction="""
       # General Job Description

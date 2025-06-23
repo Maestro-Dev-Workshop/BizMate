@@ -76,6 +76,12 @@ class CustomerServiceBot:
         runner.session = session_customer
         await call_agent_async_system(data['sys_message'], runner, chat_id[0], f"{chat_id[0]}_session")
 
+    async def send_act(self,chat_id,action):
+            try:
+                await self.bot.send_chat_action(chat_id, action=action, request_timeout=10)
+            except Exception as e:
+                return
+
     def _register_handlers(self):
         @self.bot.message_handler(commands=["hello", "start"])
         async def send_welcome_message(message):
@@ -87,7 +93,7 @@ class CustomerServiceBot:
             display_name = username or name
             chat_id = message.chat.id
             print(username, "-", name)
-            await self.bot.send_chat_action(chat_id, action='typing')
+            await self.send_act(chat_id, action='typing')
             session_id = f"{chat_id}_session"
             try:
                 session = await create_session(
@@ -140,6 +146,7 @@ class CustomerServiceBot:
             print(agent_initial_response)
 
             await self.bot.send_message(message.chat.id, response)
+        
 
         @self.bot.message_handler(func=lambda message: True)
         async def reply_to_customer(message):
@@ -150,7 +157,7 @@ class CustomerServiceBot:
             name = name or "<not-available>"
             display_name = username or name
             chat_id = message.chat.id
-            await self.bot.send_chat_action(chat_id, action='typing')
+            await self.send_act(chat_id, action='typing')
             if username == COMM:
                 session = await create_or_get_session(APP_NAME, user_id, f"{chat_id}_session", self.session_service, state={"chat_id": chat_id})
                 runner = create_runner(
@@ -194,6 +201,7 @@ class CustomerServiceBot:
                 agent_welcome_back_message = f"Agent: {welcome_back_message}\n"
                 print(agent_welcome_back_message)
                 await self.bot.send_message(message.chat.id, welcome_back_message )
+                return
             print("wdw")
             author, response = await call_agent_async(
                 message.text,
